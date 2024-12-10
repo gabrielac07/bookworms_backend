@@ -77,3 +77,22 @@ def get_maryam():
     }]
     
     return jsonify(InfoDb)
+
+# add an HTML endpoint to flask app
+@app.route('/')
+def say_hello():
+    html_content = """
+    <html>
+    <head>
+        <title>Hellox</title>
+    </head>
+    <body>
+        <h2>Hello, World!</h2>
+    </body>
+    </html>
+    """
+    return html_content
+
+if __name__ == '__main__':
+    # starts flask server on default port, http://127.0.0.1:5001
+    app.run(port=5001)
