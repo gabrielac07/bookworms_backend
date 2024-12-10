@@ -109,3 +109,22 @@ def get_maryam():
     })
     
     return jsonify(InfoDb)
+
+@app.route('/')
+def justin_did_this():
+    html_content = """
+    <html>
+    <head>
+        <title>Hellox</title>
+    </head>
+    <body>
+        <h2>Hello, World!</h2>
+        <p>Justin says hi. If your pages aren't uploading try killing your backend proceses.</p>
+    </body>
+    </html>
+    """
+    return html_content
+
+if __name__ == '__main__':
+    # starts flask server on default port, http://127.0.0.1:5001
+    app.run(port=5001)
