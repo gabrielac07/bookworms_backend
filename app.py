@@ -77,5 +77,21 @@ def get_maryam():
     }]
     return jsonify(InfoDb)
 
+
+@app.route('/')
+def say_hello():
+    html_content = """
+    <html>
+    <head>
+        <title>Bookworms</title>
+    </head>
+    <body>
+        <h2>About the Bookworms!</h2>
+    </body>
+    </html>
+    """
+    return html_content
+
+
 if __name__ == '__main__':
     app.run(debug=True)
