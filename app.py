@@ -87,7 +87,7 @@ def say_hello():
         <title>Bookworms</title>
     </head>
     <body>
-        <h2>Hello, World!</h2>
+        <h2>Hello, meet the team of the Bookworms!</h2>
     </body>
     </html>
     """
