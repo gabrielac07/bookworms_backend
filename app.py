@@ -22,7 +22,7 @@ def get_gabi():
     InfoDb = [{
         "FirstName": "Gabriela",
         "LastName": "Connelly",
-        "DOB": "October 21",
+        "DOB": "December 16",
         "Residence": "San Diego",
         "Email": "gabrielac@myyahoo.com",
         "Favorite_Books": ["Made You Up", "The Cruel Prince", "Diary of a Wimpy Kid 1-19", "Legend"]
