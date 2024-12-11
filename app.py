@@ -73,9 +73,27 @@ def get_maryam():
         "DOB": "November 23",
         "Residence": "The Bermuda Triangle",
         "Email": "maryama42841@stu.powayusd.com",
-        "Favorite_Books": ["The Outsiders", "Tex", "The Catcher in the Rye", "The Hunger Games", "Renegades"]
+        "Favorite Books": ["The Outsiders", "Tex", "The Catcher in the Rye", "The Hunger Games", "Renegades"]
     }]
+    
     return jsonify(InfoDb)
 
+
+@app.route('/')
+def say_hello():
+    html_content = """
+    <html>
+    <head>
+        <title>Bookworms</title>
+    </head>
+    <body>
+        <h2>Hello, meet the team of the Bookworms!</h2>
+    </body>
+    </html>
+    """
+    return html_content
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    # starts flask server on default port, http://127.0.0.1:5001
+    app.run(port=5001)
