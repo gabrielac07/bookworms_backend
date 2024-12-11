@@ -2,7 +2,7 @@ import jwt
 from flask import Blueprint, request, jsonify, current_app, Response, g
 from flask_restful import Api, Resource  # used for REST API building
 from datetime import datetime
-from __init__ import app
+from __init__ import app, db
 from api.jwt_authorize import token_required
 from model.group import Group
 from model.user import User
@@ -252,3 +252,18 @@ class GroupAPI:
     api.add_resource(_BULK_CRUD, '/groups')
     api.add_resource(_BULK_FILTER, '/groups/filter')
     api.add_resource(_FILTER, '/group/filter')
+
+def initGroups():
+    with app.app_context():
+        db.create_all()
+        bookworm_section = Section.query.filter_by(_name='Bookworms').first()
+        group = [
+            Group(name='Classics', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
+            Group(name='Fantasy', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
+            Group(name='Nonfiction', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
+            Group(name='Historical Fiction', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
+            Group(name='Suspense/Thriller', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
+            Group(name='Romance', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
+            Group(name='Dystopian', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
+            Group(name='Mystery', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
+        ]

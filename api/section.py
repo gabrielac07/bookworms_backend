@@ -2,9 +2,11 @@ import jwt
 from flask import Blueprint, request, jsonify, current_app, Response, g
 from flask_restful import Api, Resource  # used for REST API building
 from datetime import datetime
-from __init__ import app
+from __init__ import app, db
 from api.jwt_authorize import token_required
 from model.section import Section
+from sqlite3 import IntegrityError
+
 
 """
 This Blueprint object is used to define APIs for the Section model.
@@ -156,3 +158,17 @@ class SectionAPI:
     """
     api.add_resource(_CRUD, '/section')
     api.add_resource(_BULK_CRUD, '/sections')
+    
+def initSections():
+        with app.app_context():
+            db.create_all()
+            s1 = Section(name='Bookworms') 
+            sections = [s1]
+        
+        for section in sections:
+            try:
+                section.create()
+            except IntegrityError:
+                '''fails with bad or duplicate data'''
+                db.session.remove()
+                print(f"Records exist, duplicate email, or error: {section._name}")

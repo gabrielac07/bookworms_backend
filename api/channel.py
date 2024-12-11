@@ -2,7 +2,8 @@ import jwt
 from flask import Blueprint, request, jsonify, current_app, Response, g
 from flask_restful import Api, Resource  # used for REST API building
 from datetime import datetime
-from __init__ import app
+from sqlite3 import IntegrityError
+from __init__ import app, db
 from api.jwt_authorize import token_required
 from model.channel import Channel
 from model.group import Group
@@ -221,3 +222,51 @@ class ChannelAPI:
     api.add_resource(_BULK_CRUD, '/channels')
     api.add_resource(_BULK_FILTER, '/channels/filter')
     api.add_resource(_FILTER, '/channel/filter')
+    
+def initChannels():
+    with app.app_context():
+        db.create_all()
+        classics = Group.query.filter_by(_name='Classics').first()
+        fantasy = Group.query.filter_by(_name='Fantasy').first()
+        nonfiction = Group.query.filter_by(_name='Nonfiction').first()
+        histfic = Group.query.filter_by(_name='Historical Fiction').first()
+        suspense = Group.query.filter_by(_name='Suspense/Thriller').first()
+        romance = Group.query.filter_by(_name='Romance').first()
+        dystopian = Group.query.filter_by(_name='Dystopian').first()
+        mystery = Group.query.filter_by(_name='Mystery').first()  
+              
+        bookworm_channels = [
+            Channel(name='Book Recommender', group_id=classics.id),
+            Channel(name='Chatroom', group_id=classics.id),
+            
+            Channel(name='Book Recommender', group_id=fantasy.id),
+            Channel(name='Chatroom', group_id=fantasy.id),
+            
+            Channel(name='Book Recommender', group_id=nonfiction.id),
+            Channel(name='Chatroom', group_id=nonfiction.id),
+            
+            Channel(name='Book Recommender', group_id=histfic.id),
+            Channel(name='Chatroom', group_id=histfic.id),
+            
+            Channel(name='Book Recommender', group_id=suspense.id),
+            Channel(name='Chatroom', group_id=suspense.id),
+            
+            Channel(name='Book Recommender', group_id=romance.id),
+            Channel(name='Chatroom', group_id=romance.id),
+            
+            Channel(name='Book Recommender', group_id=dystopian.id),
+            Channel(name='Chatroom', group_id=dystopian.id),
+            
+            Channel(name='Book Recommender', group_id=mystery.id),
+            Channel(name='Chatroom', group_id=mystery.id),
+        ]
+        
+        channels = bookworm_channels
+    for channel in channels:
+        try:
+            db.session.add(channel)
+            db.session.commit()
+            print(f"Record created: {repr(channel)}")
+        except IntegrityError:
+            db.session.rollback()
+            print(f"Records exist, duplicate email, or error: {channel.name}")
