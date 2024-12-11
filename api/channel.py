@@ -236,28 +236,28 @@ def initChannels():
         mystery = Group.query.filter_by(_name='Mystery').first()  
               
         bookworm_channels = [
-            Channel(name='Book Recommender', group_id=classics.id),
+            Channel(name='Recommender', group_id=classics.id),
             Channel(name='Chatroom', group_id=classics.id),
             
-            Channel(name='Book Recommender', group_id=fantasy.id),
+            Channel(name='Recommender', group_id=fantasy.id),
             Channel(name='Chatroom', group_id=fantasy.id),
             
-            Channel(name='Book Recommender', group_id=nonfiction.id),
+            Channel(name='Recommender', group_id=nonfiction.id),
             Channel(name='Chatroom', group_id=nonfiction.id),
             
-            Channel(name='Book Recommender', group_id=histfic.id),
+            Channel(name='Recommender', group_id=histfic.id),
             Channel(name='Chatroom', group_id=histfic.id),
             
-            Channel(name='Book Recommender', group_id=suspense.id),
+            Channel(name='Recommender', group_id=suspense.id),
             Channel(name='Chatroom', group_id=suspense.id),
             
-            Channel(name='Book Recommender', group_id=romance.id),
+            Channel(name='Recommender', group_id=romance.id),
             Channel(name='Chatroom', group_id=romance.id),
             
-            Channel(name='Book Recommender', group_id=dystopian.id),
+            Channel(name='Recommender', group_id=dystopian.id),
             Channel(name='Chatroom', group_id=dystopian.id),
             
-            Channel(name='Book Recommender', group_id=mystery.id),
+            Channel(name='Recommender', group_id=mystery.id),
             Channel(name='Chatroom', group_id=mystery.id),
         ]
         
