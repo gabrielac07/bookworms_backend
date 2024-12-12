@@ -133,129 +133,73 @@ class Channel(db.Model):
         return channels
     
 def initChannels():
-    """
-    The initChannels function creates the Channel table and adds tester data to the table.
-    
-    Uses:
-        The db ORM methods to create the table.
-    
-    Instantiates:
-        Channel objects with tester data.
-    
-    Raises:
-        IntegrityError: An error occurred when adding the tester data to the table.
-    """
     with app.app_context():
-        """Create database and tables"""
         db.create_all()
-        """Tester data for table"""
-
-        # Home Page Channels
-        general = Group.query.filter_by(_name='General').first()
-        support = Group.query.filter_by(_name='Support').first()
-        home_page_channels = [
-            Channel(name='Announcements', group_id=general.id),
-            Channel(name='Events', group_id=general.id),
-            Channel(name='FAQ', group_id=support.id),
-            Channel(name='Help Desk', group_id=support.id)
-        ]
+        classics = Group.query.filter_by(_name='Classics').first()
+        fantasy = Group.query.filter_by(_name='Fantasy').first()
+        nonfiction = Group.query.filter_by(_name='Nonfiction').first()
+        histfic = Group.query.filter_by(_name='Historical Fiction').first()
+        suspense = Group.query.filter_by(_name='Suspense/Thriller').first()
+        romance = Group.query.filter_by(_name='Romance').first()
+        dystopian = Group.query.filter_by(_name='Dystopian').first()
+        mystery = Group.query.filter_by(_name='Mystery').first()  
+              
+        bookworm_channels = [
+            Channel(name='Great Expectations', group_id=classics.id),
+            Channel(name='The Outsiders', group_id=classics.id),
+            Channel(name='Heart of Darkness', group_id=classics.id),
+            Channel(name='Pride and Prejudice', group_id=classics.id),
+            Channel(name='Little Women', group_id=classics.id),
+            
+            Channel(name='A Game of Thrones', group_id=fantasy.id),
+            Channel(name='The Hobbit', group_id=fantasy.id),
+            Channel(name='Six of Crows', group_id=fantasy.id),
+            Channel(name='Harry Potter and the Sorcerer\'s Stone', group_id=fantasy.id),
+            Channel(name='The Lion, the Witch and the Wardrobe', group_id=fantasy.id),
+            
+            Channel(name='Bomb', group_id=nonfiction.id),
+            Channel(name='Night', group_id=nonfiction.id),
+            Channel(name='Educated ', group_id=nonfiction.id),
+            Channel(name='Bad Blood: Secrets and Lies in a Silicon Valley Startup', group_id=nonfiction.id),
+            Channel(name='Atomic Habits', group_id=nonfiction.id),
+           
+            Channel(name='We are Not Free', group_id=histfic.id),
+            Channel(name='The Nightingale', group_id=histfic.id),
+            Channel(name='Salt to the Sea', group_id=histfic.id),
+            Channel(name='Maus', group_id=histfic.id),
+            Channel(name='Fever 1793', group_id=histfic.id),
+            
+            Channel(name='The Silent Patient', group_id=suspense.id),
+            Channel(name='One of Us is Lying', group_id=suspense.id),
+            Channel(name='One of Us Knows', group_id=suspense.id),
+            Channel(name='The Housemaid', group_id=suspense.id),
+            Channel(name='The Naturals ', group_id=suspense.id),
+            
+            Channel(name='Gone with the Wind', group_id=romance.id),
+            Channel(name='I Hope This Doesn\'t Find You', group_id=romance.id),
+            Channel(name='The Invisible Life of Addie LaRue', group_id=romance.id),
+            Channel(name='The Fault in Our Stars', group_id=romance.id),
+            Channel(name='Heartstopper', group_id=romance.id),
+            
+            Channel(name='Legend', group_id=dystopian.id),
+            Channel(name='1984', group_id=dystopian.id),
+            Channel(name='The Hunger Games', group_id=dystopian.id),
+            Channel(name='Divergent', group_id=dystopian.id),
+            Channel(name='Brave New World', group_id=dystopian.id),
+            
+            Channel(name='A Good Girl\'s Guide to Murder', group_id=mystery.id),
+            Channel(name='The Inheritance Games', group_id=mystery.id),
+            Channel(name='We Were Liars', group_id=mystery.id),
+            Channel(name='Truly Devious', group_id=mystery.id),
+            Channel(name='Two Can Keep A Secret', group_id=mystery.id),
+]
         
-        # Shared Interest Channels 
-        limitless_connection = Group.query.filter_by(_name='Limitless Connections').first() 
-        dnhs_football = Group.query.filter_by(_name='DNHS Football').first() 
-        school_subjects = Group.query.filter_by(_name='School Subjects').first()
-        music = Group.query.filter_by(_name='Music').first()
-        satire = Group.query.filter_by(_name='Satire').first()
-        activity_hub = Group.query.filter_by(_name='Activity Hub').first()
-        shared_interest_channels = [
-            Channel(name='Penpal Letters', group_id=limitless_connection.id),
-            Channel(name='Game vs Poway', group_id=dnhs_football.id),
-            Channel(name='Game vs Westview', group_id=dnhs_football.id),
-            Channel(name='Math', group_id=school_subjects.id),
-            Channel(name='English', group_id=school_subjects.id),
-            Channel(name='Artist', group_id=music.id),
-            Channel(name='Music Genre', group_id=music.id),
-            Channel(name='Humor', group_id=satire.id),
-            Channel(name='Memes', group_id=satire.id),
-            Channel(name='Irony', group_id=satire.id),
-            Channel(name='Cyber Patriots', group_id=activity_hub.id),
-            Channel(name='Robotics', group_id=activity_hub.id),
-        ]
-        
-        #P3 Channels Below
-         # Share and Care channels below:
-        DNHSCafe = Group.query.filter_by(_name='Study Room').first()
-        chess_forum = Group.query.filter_by(_name='Chess Forum').first()
-        Underground_Music = Group.query.filter_by(_name='Underground Music').first()
-        share_and_care_channels = [
-            Channel(name='Math', group_id=DNHSCafe.id),
-            Channel(name='Chemistry', group_id=DNHSCafe.id),
-            Channel(name='Biology', group_id=DNHSCafe.id),
-            Channel(name='English', group_id=DNHSCafe.id),
-            Channel(name='Coding', group_id=DNHSCafe.id),
-            Channel(name='History', group_id=DNHSCafe.id),
-            Channel(name='General', group_id=chess_forum.id),
-            Channel(name='Chess Tips', group_id=chess_forum.id),
-            Channel(name='Game Updates', group_id=chess_forum.id),
-            Channel(name='Artists', group_id=Underground_Music.id),
-            Channel(name='Songs', group_id=Underground_Music.id),
-            Channel(name='Genres', group_id=Underground_Music.id),
-        ]
-
-        # P2 channels below:
-        
-        # Vote for the GOAT channels below:
-        internet_debates = Group.query.filter_by(_name='Internet Debates').first() 
-        calico_vote = Group.query.filter_by(_name='Calico Vote').first() 
-        dnero_store = Group.query.filter_by(_name='Dnero Store').first()
-        beverage_debates = Group.query.filter_by(_name='Beverage Debates').first()
-        nfl_goats = Group.query.filter_by(_name='NFL GOATs').first()
-        car_debates = Group.query.filter_by(_name='Car Debates').first()
-        vote_for_the_goat_channels = [
-            Channel(name='Milk vs Cereal', group_id=internet_debates.id),
-            Channel(name='Hot Dog Sandwich', group_id=internet_debates.id),
-            Channel(name='Pineapple on Pizza', group_id=internet_debates.id),
-            Channel(name='Cats vs Dogs', group_id=internet_debates.id),
-            Channel(name='Coffee or Tea', group_id=internet_debates.id),
-            Channel(name='Economy Cars', group_id=car_debates.id),
-            Channel(name='Luxury Cars', group_id=car_debates.id),
-            Channel(name='Vintage Cars', group_id=car_debates.id),
-            Channel(name='Student Cars', group_id=car_debates.id),
-            Channel(name='Adventure Play House', group_id=calico_vote.id),
-            Channel(name='Sylvanian Family Restraunt House', group_id=calico_vote.id),
-            Channel(name='Magical Mermaid Castle House', group_id=calico_vote.id),
-            Channel(name='Woody School House', group_id=calico_vote.id),
-            Channel(name='Spooky Suprise Haunted House', group_id=calico_vote.id),
-            Channel(name='Brick Oven Bakery House', group_id=calico_vote.id),
-            Channel(name='Food and Drink', group_id=dnero_store.id),
-            Channel(name='Spirit', group_id=dnero_store.id),
-            Channel(name='Limited Edition', group_id=dnero_store.id),
-            Channel(name='Quarterbacks', group_id=nfl_goats.id),
-            Channel(name='Running Backs', group_id=nfl_goats.id),
-            Channel(name='Wide Receivers', group_id=nfl_goats.id),
-            Channel(name='Defensive Players', group_id=nfl_goats.id),
-            Channel(name='NFL Divisions', group_id=nfl_goats.id),
-            Channel(name='Gift Cards', group_id=dnero_store.id),
-        ]
-        
-        # P5 Channels: 
-        book_reviews = Group.query.filter_by(_name='Book Reviews').first() 
-        instabox = Group.query.filter_by(_name='Instabox').first() 
-        flavor_fusion = Group.query.filter_by(_name='Flavor Fusion').first()
-        update_the_nest = Group.query.filter_by(_name='Update The Nest').first()
-        rate_and_relate_channels = [
-            Channel(name='Fiction Books', group_id=book_reviews.id),
-            Channel(name='Nonfiction Books', group_id=book_reviews.id),
-            Channel(name='Combos', group_id=flavor_fusion.id),
-        ]
-        
-        
-        channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels + rate_and_relate_channels
-        for channel in channels:
-            try:
-                db.session.add(channel)
-                db.session.commit()
-                print(f"Record created: {repr(channel)}")
-            except IntegrityError:
-                db.session.rollback()
-                print(f"Records exist, duplicate email, or error: {channel.name}")
+        channels = bookworm_channels
+    for channel in channels:
+        try:
+            db.session.add(channel)
+            db.session.commit()
+            print(f"Record created: {repr(channel)}")
+        except IntegrityError:
+            db.session.rollback()
+            print(f"Records exist, duplicate email, or error: {channel.name}")
