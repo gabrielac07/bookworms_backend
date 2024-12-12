@@ -145,30 +145,54 @@ def initChannels():
         mystery = Group.query.filter_by(_name='Mystery').first()  
               
         bookworm_channels = [
-            Channel(name='Recommender', group_id=classics.id),
-            Channel(name='Chatroom', group_id=classics.id),
+            Channel(name='Great Expectations', group_id=classics.id),
+            Channel(name='The Outsiders', group_id=classics.id),
+            Channel(name='Heart of Darkness', group_id=classics.id),
+            Channel(name='Pride and Prejudice', group_id=classics.id),
+            Channel(name='Little Women', group_id=classics.id),
             
-            Channel(name='Recommender', group_id=fantasy.id),
-            Channel(name='Chatroom', group_id=fantasy.id),
+            Channel(name='A Game of Thrones', group_id=fantasy.id),
+            Channel(name='The Hobbit', group_id=fantasy.id),
+            Channel(name='Six of Crows', group_id=fantasy.id),
+            Channel(name='Harry Potter and the Sorcerer\'s Stone', group_id=fantasy.id),
+            Channel(name='The Lion, the Witch and the Wardrobe', group_id=fantasy.id),
             
-            Channel(name='Recommender', group_id=nonfiction.id),
-            Channel(name='Chatroom', group_id=nonfiction.id),
+            Channel(name='Bomb', group_id=nonfiction.id),
+            Channel(name='Night', group_id=nonfiction.id),
+            Channel(name='Educated ', group_id=nonfiction.id),
+            Channel(name='Bad Blood: Secrets and Lies in a Silicon Valley Startup', group_id=nonfiction.id),
+            Channel(name='Atomic Habits', group_id=nonfiction.id),
+           
+            Channel(name='We are Not Free', group_id=histfic.id),
+            Channel(name='The Nightingale', group_id=histfic.id),
+            Channel(name='Salt to the Sea', group_id=histfic.id),
+            Channel(name='Maus', group_id=histfic.id),
+            Channel(name='Fever 1793', group_id=histfic.id),
             
-            Channel(name='Recommender', group_id=histfic.id),
-            Channel(name='Chatroom', group_id=histfic.id),
+            Channel(name='The Silent Patient', group_id=suspense.id),
+            Channel(name='One of Us is Lying', group_id=suspense.id),
+            Channel(name='One of Us Knows', group_id=suspense.id),
+            Channel(name='The Housemaid', group_id=suspense.id),
+            Channel(name='The Naturals ', group_id=suspense.id),
             
-            Channel(name='Recommender', group_id=suspense.id),
-            Channel(name='Chatroom', group_id=suspense.id),
+            Channel(name='Gone with the Wind', group_id=romance.id),
+            Channel(name='I Hope This Doesn\'t Find You', group_id=romance.id),
+            Channel(name='The Invisible Life of Addie LaRue', group_id=romance.id),
+            Channel(name='The Fault in Our Stars', group_id=romance.id),
+            Channel(name='Heartstopper', group_id=romance.id),
             
-            Channel(name='Recommender', group_id=romance.id),
-            Channel(name='Chatroom', group_id=romance.id),
+            Channel(name='Legend', group_id=dystopian.id),
+            Channel(name='1984', group_id=dystopian.id),
+            Channel(name='The Hunger Games', group_id=dystopian.id),
+            Channel(name='Divergent', group_id=dystopian.id),
+            Channel(name='Brave New World', group_id=dystopian.id),
             
-            Channel(name='Recommender', group_id=dystopian.id),
-            Channel(name='Chatroom', group_id=dystopian.id),
-            
-            Channel(name='Recommender', group_id=mystery.id),
-            Channel(name='Chatroom', group_id=mystery.id),
-        ]
+            Channel(name='A Good Girl\'s Guide to Murder', group_id=mystery.id),
+            Channel(name='The Inheritance Games', group_id=mystery.id),
+            Channel(name='We Were Liars', group_id=mystery.id),
+            Channel(name='Truly Devious', group_id=mystery.id),
+            Channel(name='Two Can Keep A Secret', group_id=mystery.id),
+]
         
         channels = bookworm_channels
     for channel in channels:
