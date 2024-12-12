@@ -1,4 +1,5 @@
-import jwt
+import jwt 
+from sqlite3 import IntegrityError
 from flask import Blueprint, request, jsonify, current_app, Response, g
 from flask_restful import Api, Resource  # used for REST API building
 from datetime import datetime
@@ -257,7 +258,7 @@ def initGroups():
     with app.app_context():
         db.create_all()
         bookworm_section = Section.query.filter_by(_name='Bookworms').first()
-        group = [
+        groups += [
             Group(name='Classics', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
             Group(name='Fantasy', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
             Group(name='Nonfiction', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
@@ -267,3 +268,11 @@ def initGroups():
             Group(name='Dystopian', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
             Group(name='Mystery', section_id=bookworm_section.id, moderators=[User.query.get(1)]),
         ]
+        for group in groups:
+            try:
+                db.session.add(group)
+                db.session.commit()
+                print(f"Record created: {repr(group)}")
+            except IntegrityError:
+                db.session.rollback()
+                print(f"Records exist, duplicate email, or error: {group._name}")
