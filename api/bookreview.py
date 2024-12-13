@@ -25,7 +25,8 @@ def random_book():
         return jsonify({
             'title': book[1],
             'author': book[2],
-            'description': book[3]
+            'description': book[3], # Book description
+            'image_url': book[4]    # Book image URL
         })
     else:
         return jsonify({'error': 'No books found'}), 404
