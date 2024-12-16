@@ -41,8 +41,8 @@ def random_book():
         return jsonify({
             'title': book[1],
             'author': book[2],
-            'description': book[3], # Book description
-            'image_cover': book[4]    # Book cover image URL
+            'description': book[4], # Book description
+            'image_cover': book[5]    # Book cover image URL
         })
     else:
         return jsonify({'error': 'No books found for the specified genre'}), 404
