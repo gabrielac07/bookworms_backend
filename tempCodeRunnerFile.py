@@ -23,14 +23,11 @@ from api.channel import channel_api
 from api.group import group_api
 from api.section import section_api
 from api.student import student_api
-from api.bookrec import bookrec_api
 from api.nestPost import nestPost_api # Justin added this, custom format for his website
 from api.messages_api import messages_api # Adi added this, messages for his website
 from api.carphoto import car_api
 from api.carChat import car_chat_api
 from api.bookreview import bookreview_api
-from api.wishlist import wishlist_api  # Import the wishlist blueprint
-
 
 from api.vote import vote_api
 # database Initialization functions
@@ -47,14 +44,12 @@ from model.vote import Vote, initVotes
 # register URIs for api endpoints
 app.register_blueprint(messages_api) # Adi added this, messages for his website
 app.register_blueprint(user_api)
-app.register_blueprint(wishlist_api)
 app.register_blueprint(pfp_api) 
 app.register_blueprint(post_api)
 app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
 app.register_blueprint(student_api)
-app.register_blueprint(bookrec_api)
 app.register_blueprint(car_chat_api)
 app.register_blueprint(bookreview_api)
 # Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
@@ -62,7 +57,6 @@ app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
-
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
