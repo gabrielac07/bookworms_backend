@@ -7,7 +7,7 @@ CORS(app, supports_credentials=True, origins='*')  # Allow all origins (*)
 
 @app.route('/api/avika')
 def get_avika():
-    InfoDb = [{
+    avika_info = [{
         "FirstName": "Avika",
         "LastName": "Prasad",
         "DOB": "January 22",
@@ -15,11 +15,11 @@ def get_avika():
         "Email": "avikapd22@gmail.com",
         "Favorite_Books": ["The Inheritance Games", "Harry Potter 1-7", "Mystiwick School of Musicraft", "The Hunger Games"]
     }]
-    return jsonify(InfoDb)
+    return jsonify(avika_info)
 
 @app.route('/api/gabi')
 def get_gabi():
-    InfoDb = [{
+    gabi_info = [{
         "FirstName": "Gabriela",
         "LastName": "Connelly",
         "DOB": "December 16",
@@ -27,11 +27,11 @@ def get_gabi():
         "Email": "gabrielac@myyahoo.com",
         "Favorite_Books": ["Made You Up", "The Cruel Prince", "Diary of a Wimpy Kid 1-19", "Legend"]
     }]
-    return jsonify(InfoDb)
+    return jsonify(gabi_info)
 
 @app.route('/api/katherine')
 def get_katherine():
-    InfoDb = [{
+    katherine_info = [{
         "FirstName": "Katherine",
         "LastName": "Chen",
         "DOB": "July 30",
@@ -39,11 +39,11 @@ def get_katherine():
         "Email": "katherine.yx.chen@gmail.com",
         "Favorite_Books": ["A Court of Thornes and Roses", "Talon", "49 Miles Alone", "They Both Die in the End", "The Silent Patient"]
     }]
-    return jsonify(InfoDb)
+    return jsonify(katherine_info)
 
 @app.route('/api/soumini')
 def get_soumini():
-    InfoDb = [{
+    soumini_info = [{
         "FirstName": "Soumini",
         "LastName": "Kandula",
         "DOB": "December 21",
@@ -51,11 +51,11 @@ def get_soumini():
         "Email": "souminik21@gmail.com",
         "Favorite_Books": ["Harry Potter 1-7", "The Silent Patient", "A Good Girl's Guide to Murder", "Legend", "The Fault in Our Stars"]
     }]
-    return jsonify(InfoDb)
+    return jsonify(soumini_info)
 
 @app.route('/api/aditi')
 def get_aditi():
-    InfoDb = [{
+    aditi_info = [{
         "FirstName": "Aditi",
         "LastName": "Bandaru",
         "DOB": "May 21",
@@ -63,11 +63,11 @@ def get_aditi():
         "Email": "aditib03015@stu.powayusd.com",
         "Favorite_Books": ["A Feast for Crows", "Scythe", "A Game of Thrones", "Wings of Fires", "Frankenstein"]
     }]
-    return jsonify(InfoDb)
+    return jsonify(aditi_info)
 
 @app.route('/api/maryam')
 def get_maryam():
-    InfoDb = [{
+    maryam_info = [{
         "FirstName": "Maryam",
         "LastName": "Abdul-Aziz",
         "DOB": "November 23",
@@ -75,9 +75,7 @@ def get_maryam():
         "Email": "maryama42841@stu.powayusd.com",
         "Favorite Books": ["The Outsiders", "Tex", "The Catcher in the Rye", "The Hunger Games", "Renegades"]
     }]
-    
-    return jsonify(InfoDb)
-
+    return jsonify(maryam_info)
 
 @app.route('/')
 def say_hello():
@@ -92,7 +90,6 @@ def say_hello():
     </html>
     """
     return html_content
-
 
 if __name__ == '__main__':
     # starts flask server on default port, http://127.0.0.1:5001
