@@ -46,14 +46,14 @@ def random_book():
     
     book = get_random_book(genre)
     if book:
-        return jsonify({
+        return jsonify({ # Numbers refer to the books.db column the variable is in (genre is 3 but we don't want to display that when a value is inputted)
             'title': book[1],
             'author': book[2],
-            'description': book[4], # Book description
+            'description': book[4], # Book short summary
             'image_cover': book[5]    # Book cover image URL
         })
     else:
         return jsonify({'error': 'No books found for the specified genre'}), 404
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8887)
+    app.run(debug=True, host='0.0.0.0', port=5002)
