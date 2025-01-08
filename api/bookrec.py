@@ -5,6 +5,7 @@ from flask_restful import Api, Resource # used for REST API building
 import sqlite3
 import random
 
+#This database setup is the one mort didn't teach. Rework this.
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
