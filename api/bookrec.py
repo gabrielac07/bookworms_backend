@@ -1,12 +1,11 @@
-from flask import Flask, jsonify, request #Import request to handle query parameters
-from flask_cors import CORS  # Import CORS
-from flask import Blueprint
-from flask_restful import Api, Resource # used for REST API building
-import sqlite3
+from flask import Flask, jsonify, request, Blueprint
+from flask_cors import CORS
+from flask_restful import Api, Resource
+from flask_sqlalchemy import SQLAlchemy
 import random
+import time
 
-#This database setup is the one mort didn't teach. Rework this.
-app = Flask(__name__)
+app = Flask('bookrec_api')
 CORS(app)  # Enable CORS for all routes
 
 bookrec_api = Blueprint('bookrec_api', __name__,
@@ -15,46 +14,60 @@ bookrec_api = Blueprint('bookrec_api', __name__,
 # API docs https://flask-restful.readthedocs.io/en/latest/
 api = Api(bookrec_api)
 
+# Configuration for SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# Define the Book model
+class Book(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100))
+    author = db.Column(db.String(100))
+    genre = db.Column(db.String(50))
+    description = db.Column(db.String(500))
+    image_cover = db.Column(db.String(200))
+
+    def to_dict(self):
+        return {
+            'title': self.title,
+            'author': self.author,
+            'description': self.description,
+            'image_cover': self.image_cover
+        }
+
 # Helper function to get a random book from the database filtered by genre
 def get_random_book(genre=None):
-    conn = sqlite3.connect('books.db')
-    cursor = conn.cursor()
-    #cursor.execute("SELECT * FROM books")
-    #books = cursor.fetchall()
-    #conn.close()
-
     if genre:
-        #Filter books by genre
-        cursor.execute("SELECT * FROM books WHERE LOWER(genre) = ?", (genre.lower(),))
+        books = Book.query.filter(Book.genre.ilike(f'%{genre}%')).all()
     else:
-        #Fetch all books if no genre is provided
-        cursor.execute("SELECT * FROM books")
+        books = Book.query.all()
     
-    books = cursor.fetchall()
-    conn.close()
+    print(f"Books retrieved for genre '{genre}': {books}")  # Debug log
 
-    #Debug log: Print retrirved book
-    print(f"Books retrieved for genre '{genre}': {books}")
-
-    # Pick a random book
     return random.choice(books) if books else None
 
 # Endpoint to get a random book
-@app.route('/api/random_book', methods=['GET'])
+@bookrec_api.route('/random_book', methods=['GET'])
 def random_book():
-    genre = request.args.get('genre') # Get the 'genre' parameter from the request
+    genre = request.args.get('genre')  # Get the 'genre' parameter from the request
     print(f"Received genre: {genre}")  # Debug log
     
-    book = get_random_book(genre)
-    if book:
-        return jsonify({ # Numbers refer to the books.db column the variable is in (genre is 3 but we don't want to display that when a value is inputted)
-            'title': book[1],
-            'author': book[2],
-            'description': book[4], # Book short summary
-            'image_cover': book[5]    # Book cover image URL
-        })
-    else:
-        return jsonify({'error': 'No books found for the specified genre'}), 404
+    while True:
+        book = get_random_book(genre)
+        if book:
+            return jsonify(book.to_dict())
+        else:
+            print("No books found, retrying in 5 seconds...")
+            time.sleep(5)
 
 if __name__ == '__main__':
+    # Register the Blueprint with the app
+    app.register_blueprint(bookrec_api)
+
+    # Only create tables if they do not exist
+    with app.app_context():
+        db.create_all()
+    
     app.run(debug=True, host='0.0.0.0', port=5002)
