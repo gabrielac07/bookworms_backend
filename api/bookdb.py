@@ -1,57 +1,42 @@
+from flask import Flask, Blueprint, jsonify, request
 import sqlite3
 
+# Blueprint for books API
+books_api = Blueprint('books_api', __name__, url_prefix='/api/books')
+
+# Function to create the database and table if it does not exist
 def create_database():
-    """Creates a database file named 'books.db' and a table named 'books' to store book information."""
+    conn = sqlite3.connect('books.db')
+    cursor = conn.cursor()
+    # Create the 'books' table with the correct schema if it doesn't exist
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS books (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        author TEXT NOT NULL,
+        genre TEXT NOT NULL,
+        description TEXT,
+        image_cover TEXT
+    )
+    ''')
+    conn.commit()
+    conn.close()
 
-    try:
-        with sqlite3.connect('books.db') as conn:
-            cursor = conn.cursor()
-
-            # Create the table if it doesn't exist
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS books (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT,
-                    author TEXT,
-                    genre TEXT,
-                    description TEXT,
-                    image_cover TEXT
-                )
-            ''')
-    except sqlite3.Error as e:
-        print(f"Error creating database: {e}")
-
+# Function to insert a book into the 'books' table
 def insert_book(title, author, genre, description, image_cover):
-    """Inserts a new book into the database."""
+    conn = sqlite3.connect('books.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO books (title, author, genre, description, image_cover)
+    VALUES (?, ?, ?, ?, ?)
+    ''', (title, author, genre, description, image_cover))
+    conn.commit()
+    conn.close()
 
-    try:
-        with sqlite3.connect('books.db') as conn:
-            cursor = conn.cursor()
-
-            cursor.execute('''
-                INSERT INTO books (title, author, genre, description, image_cover)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (title, author, genre, description, image_cover))
-    except sqlite3.Error as e:
-        print(f"Error inserting book: {e}")
-
-def get_all_books():
-    """Retrieves all books from the database."""
-
-    try:
-        with sqlite3.connect('books.db') as conn:
-            cursor = conn.cursor()
-
-            cursor.execute('SELECT * FROM books')
-            books = cursor.fetchall()
-
-            return books
-    except sqlite3.Error as e:
-        print(f"Error retrieving books: {e}")
-        return []
-
-
+# Create the database and table on startup
 create_database()
+
+# Insert books into the 'books' table
 insert_book("Great Expectations", "Charles Dickens", "Classics", "Great Expectations follows the childhood and young adult years of Pip a blacksmith's apprentice in a country village. He suddenly comes into a large fortune (his great expectations) from a mysterious benefactor. and moves to London where he enters high society.", "https://m.media-amazon.com/images/I/715lBsaI4sL.jpg")
 insert_book("The Outsiders", "S.E. Hinton", "Classics", "Ponyboy, a greaser from the 'wrong' side of town, struggles to find his place in society alongside his friends after personal tragedies.", "https://m.media-amazon.com/images/I/71Bg39CmhoL.jpg")
 insert_book("Heart of Darkness", "Joseph Conrad", "Classics", "The novella follows Charles Marlow, a steamboat captain, as he journeys up the Congo River to find Kurtz, an ivory trader with a mysterious reputation. Marlow witnesses the brutal exploitation of the African people and the moral decay of European colonialists, culminating in his encounter with Kurtz, who has descended into madness and godlike tyranny. The story explores themes of imperialism, human nature, and the blurred line between civilization and savagery.", "https://mpd-biblio-covers.imgix.net/9781509850921.jpg")
@@ -94,6 +79,63 @@ insert_book("We Were Liars", "E. Lockhart", "Mystery", "We Were Liars is a myste
 insert_book("Truly Devious", "Maureen Johnson", "Mystery", "The premise of this book follows Stevie Bell as she is given a once in a lifetime chance to attend a prestigious boarding school. But this isn't a normal school, this is the place where the crime she has always been obsessed with took place, and she is determined to solve it.", "https://m.media-amazon.com/images/I/71yU7yRcd2L._AC_UF894,1000_QL80_.jpg")
 insert_book("Two Can Keep A Secret", "Karen M. McManus", "Mystery", "Two Can Keep a Secret is a story of two high schoolers told in alternating first-person point of view. The first is Ellery Corcoran, who has moved to live with her grandmother in the small town of Echo Ridge with her twin brother, Ezra, after their actress mother, Sadie, is forced into rehab.", "https://m.media-amazon.com/images/I/91-+JSk4XbL.jpg")
 
-books = get_all_books()
-for book in books: 
-    print(book)
+
+# API route to get all books
+@books_api.route('/', methods=['GET'])
+def get_books():
+    """API endpoint to retrieve all books."""
+    try:
+        with sqlite3.connect('books.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM books')
+            books = cursor.fetchall()
+
+            # Format books into a list of dictionaries
+            books_list = [
+                {
+                    'id': book[0],
+                    'title': book[1],
+                    'author': book[2],
+                    'genre': book[3],
+                    'description': book[4],
+                    'image_cover': book[5]
+                }
+                for book in books
+            ]
+            return jsonify(books_list), 200
+    except sqlite3.Error as e:
+        return jsonify({'error': str(e)}), 500
+
+# API route to add a new book
+@books_api.route('/', methods=['POST'])
+def add_book():
+    """API endpoint to add a new book."""
+    data = request.json
+    title = data.get('title')
+    author = data.get('author')
+    genre = data.get('genre')
+    description = data.get('description')
+    image_cover = data.get('image_cover')
+
+    if not all([title, author, genre, description, image_cover]):
+        return jsonify({'error': 'All fields are required'}), 400
+
+    try:
+        with sqlite3.connect('books.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO books (title, author, genre, description, image_cover)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (title, author, genre, description, image_cover))
+            conn.commit()
+            return jsonify({'message': 'Book added successfully'}), 201
+    except sqlite3.Error as e:
+        return jsonify({'error': str(e)}), 500
+
+# Flask app initialization
+app = Flask(__name__)
+app.register_blueprint(books_api)
+
+if __name__ == '__main__':
+    create_database()
+    app.run(debug=True)
