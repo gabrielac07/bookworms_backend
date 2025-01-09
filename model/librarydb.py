@@ -1,6 +1,5 @@
 import jwt
 from sqlite3 import IntegrityError
-from sqlalchemy.ext.declarative import declarative_base
 from flask import Blueprint, request, jsonify, current_app, Response, g
 from flask_restful import Api, Resource
 from sqlalchemy import create_engine, Column, Integer, String, Text, MetaData, Table
