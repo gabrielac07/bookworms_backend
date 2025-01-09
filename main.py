@@ -30,6 +30,8 @@ from api.carphoto import car_api
 from api.carChat import car_chat_api
 from api.bookreview import bookreview_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
+from api.suggest import suggest_api
+
 
 
 from api.vote import vote_api
@@ -57,6 +59,7 @@ app.register_blueprint(student_api)
 app.register_blueprint(bookrec_api)
 app.register_blueprint(car_chat_api)
 app.register_blueprint(bookreview_api)
+app.register_blueprint(suggest_api)
 # Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
 app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
