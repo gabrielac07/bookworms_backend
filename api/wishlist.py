@@ -32,7 +32,7 @@ def get_wishlist():
     wishlist_items = Wishlist.query.all()  # Fetch all wishlist entries
     books_in_wishlist = []
     for item in wishlist_items:
-        book = book.query.get(item.book_id)
+        book = Book.query.get(item.book_id)
         if book:
             books_in_wishlist.append({'id': book.id, 'title': book.title, 'author': book.author})
     return jsonify(books_in_wishlist)
@@ -50,7 +50,7 @@ def add_book_to_wishlist():
             return jsonify({"error": "Missing book_id"}), 400
 
         # Check if the book exists in the books database
-        book = book.query.get(book_id)
+        book = Book.query.get(book_id)
         if not book:
             return jsonify({"error": "Book not found"}), 404
 
