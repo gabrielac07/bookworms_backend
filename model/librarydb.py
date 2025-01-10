@@ -62,14 +62,15 @@ def initBooks():
   
     # Insert the books data into the table
     for book in books_data:
-        new_book = Book(
+        if not Book.query.filter_by(title=book[0]).first():
+            new_book = Book(
             title=book[0],
             author=book[1],
             genre=book[2],
             description=book[3],
             cover_image_url=book[4]
         )
-        db.session.add(new_book)
+            db.session.add(new_book)
     
     try:
         db.session.commit()
