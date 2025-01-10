@@ -44,6 +44,7 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
+from model.librarydb import Book, initBooks 
 # server only Views
 
 # register URIs for api endpoints

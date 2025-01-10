@@ -1,3 +1,4 @@
+## This is the absolutely useless file that we absolutely should not be using
 import sqlite3
 
 def create_database():

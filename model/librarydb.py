@@ -71,7 +71,6 @@ def initBooks():
         )
         db.session.add(new_book)
     
-    # Commit the transaction to the database
     try:
         db.session.commit()
     except IntegrityError:
@@ -80,4 +79,8 @@ def initBooks():
     except Exception as e:
         db.session.rollback()
         print(f"Error: {e}")
-    
+
+# Create the tables before inserting data
+with app.app_context():
+    db.create_all()
+    initBooks()

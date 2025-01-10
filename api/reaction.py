@@ -1,9 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-app = Flask(__name__)
-CORS(app)
-
 # In-memory data storage
 messages = {}  # Example format: {"message_id": {"reactions": {"👍": 5, "❤️": 2}}}
 emojis = ["👍", "❤️", "😂", "🎉", "😢", "😡"]
