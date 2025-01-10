@@ -61,7 +61,6 @@ app.register_blueprint(bookrec_api)
 app.register_blueprint(car_chat_api)
 app.register_blueprint(bookreview_api)
 app.register_blueprint(suggest_api)
-# Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
 app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
@@ -174,6 +173,7 @@ def generate_data():
     initPosts()
     initNestPosts()
     initVotes()
+    initBooks()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
