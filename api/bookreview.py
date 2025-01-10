@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from flask_restful import Api
-from model.librarydb import Book  
+from model.librarydb import book  
 import random
 from __init__ import app, db 
 
@@ -12,7 +12,7 @@ api = Api(bookreview_api)
 def get_random_book():
     try:
         # Query all books using SQLAlchemy ORM and random choice
-        books_query = Book.query.all()  # Fetch all books from the database
+        books_query = book.query.all()  # Fetch all books from the database
         if books_query:
             return random.choice(books_query)  # Pick a random book if books are available
         else:

@@ -1,62 +1,41 @@
 from flask import Blueprint, jsonify, request
-import sqlite3
+from __init__ import db  # Import db object from your Flask app's __init__.py
+from model.librarydb import book
 
 # Create a Blueprint for the wishlist functionality
 wishlist_api = Blueprint('wishlist_api', __name__, url_prefix='/api/wishlist')
 
-DATABASE = 'library.db'  # Use the new library database
+# Define the Wishlist model directly in this file
+class Wishlist(db.Model):
+    __tablename__ = 'wishlist'
 
-def get_db_connection(database):
-    """Establish a database connection to the specified database."""
-    conn = sqlite3.connect(database)
-    conn.row_factory = sqlite3.Row  # Access columns by name
-    conn.execute('PRAGMA foreign_keys = ON')  # Enable foreign key constraints
-    return conn
+    id = db.Column(db.Integer, primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
 
-def init_db():
-    """Initialize the database by creating the wishlist table."""
-    conn = get_db_connection(DATABASE)
+    book = db.relationship('Book', backref='wishlist', lazy=True)
 
-    # Drop the wishlist table if it exists to ensure no conflicts with schema changes
-    conn.execute('DROP TABLE IF EXISTS wishlist')
-    conn.commit()
-
-    # Create the wishlist table without the user_uid (no user_id)
-    create_wishlist_table = '''
-    CREATE TABLE IF NOT EXISTS wishlist (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        book_id INTEGER NOT NULL,  -- Reference to books table
-        FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE
-    );
-    '''
-    conn.execute(create_wishlist_table)
-    conn.commit()
-    conn.close()
-    print("Database initialized with the wishlist table!")
+    def __repr__(self):
+        return f"<Wishlist(id={self.id}, book_id={self.book_id})>"
 
 # Route to get a dropdown list of books
 @wishlist_api.route('/books', methods=['GET'])
 def get_books():
     """Retrieve all books from the database to display in a dropdown menu."""
-    conn = get_db_connection(DATABASE)
-    books = conn.execute('SELECT id, title, author FROM books').fetchall()
-    conn.close()
-    return jsonify([dict(book) for book in books])
+    books = book.query.all()  # SQLAlchemy query to get all books from the books table
+    books_list = [{'id': book.id, 'title': book.title, 'author': book.author} for book in books]
+    return jsonify(books_list)
 
 # Route to get all books in the wishlist (no user associated)
 @wishlist_api.route('/', methods=['GET'])
 def get_wishlist():
     """Retrieve all books in the wishlist."""
-    conn = get_db_connection(DATABASE)
-    books = conn.execute(
-        '''
-        SELECT books.id, books.title, books.author
-        FROM wishlist
-        JOIN books ON wishlist.book_id = books.id
-        '''
-    ).fetchall()
-    conn.close()
-    return jsonify([dict(book) for book in books])
+    wishlist_items = Wishlist.query.all()  # Fetch all wishlist entries
+    books_in_wishlist = []
+    for item in wishlist_items:
+        book = book.query.get(item.book_id)
+        if book:
+            books_in_wishlist.append({'id': book.id, 'title': book.title, 'author': book.author})
+    return jsonify(books_in_wishlist)
 
 # Route to add a book to the wishlist
 @wishlist_api.route('/', methods=['POST'])
@@ -71,32 +50,20 @@ def add_book_to_wishlist():
             return jsonify({"error": "Missing book_id"}), 400
 
         # Check if the book exists in the books database
-        conn = get_db_connection(DATABASE)
-        book = conn.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
+        book = book.query.get(book_id)
         if not book:
-            conn.close()
             return jsonify({"error": "Book not found"}), 404
 
         # Check if the book is already in the wishlist
-        existing_entry = conn.execute(
-            'SELECT * FROM wishlist WHERE book_id = ?',
-            (book_id,)
-        ).fetchone()
+        existing_entry = Wishlist.query.filter_by(book_id=book_id).first()
         if existing_entry:
-            conn.close()
             return jsonify({"message": "Book already in wishlist"}), 200
 
         # Add the book to the wishlist
-        conn.execute(
-            'INSERT INTO wishlist (book_id) VALUES (?)',
-            (book_id,)
-        )
-        conn.commit()
-        conn.close()
+        new_entry = Wishlist(book_id=book_id)
+        db.session.add(new_entry)
+        db.session.commit()
 
         return jsonify({"message": "Book added to wishlist"}), 201
 
     return jsonify({"error": "Request must be JSON"}), 415
-
-# Initialize the database when this module is imported
-init_db()
