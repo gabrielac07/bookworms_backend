@@ -5,20 +5,11 @@ from flask_sqlalchemy import SQLAlchemy
 import random
 import time
 
-app = Flask('bookrec_api')
-CORS(app)  # Enable CORS for all routes
-
 bookrec_api = Blueprint('bookrec_api', __name__,
                    url_prefix='/api')
 
 # API docs https://flask-restful.readthedocs.io/en/latest/
 api = Api(bookrec_api)
-
-# Configuration for SQLAlchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
 
 # Define the Book model
 class Book(db.Model):
