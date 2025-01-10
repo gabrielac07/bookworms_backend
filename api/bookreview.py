@@ -8,11 +8,10 @@ from __init__ import app, db
 bookreview_api = Blueprint('bookreview_api', __name__, url_prefix='/api')
 api = Api(bookreview_api)
 
-# Function to get a random book
 def get_random_book():
     try:
         # Query all books using SQLAlchemy ORM and random choice
-        books_query = book.query.all()  # Fetch all books from the database
+        books_query = Book.query.all()  # Fetch all books from the database
         if books_query:
             return random.choice(books_query)  # Pick a random book if books are available
         else:

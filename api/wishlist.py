@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from __init__ import app, db  # Import db object from your Flask app's __init__.py
-from model.librarydb import book
+from model.librarydb import Book
 
 # Create a Blueprint for the wishlist functionality
 wishlist_api = Blueprint('wishlist_api', __name__, url_prefix='/api/wishlist')
@@ -21,7 +21,7 @@ class Wishlist(db.Model):
 @wishlist_api.route('/books', methods=['GET'])
 def get_books():
     """Retrieve all books from the database to display in a dropdown menu."""
-    books = book.query.all()  # SQLAlchemy query to get all books from the books table
+    books = Book.query.all()  # SQLAlchemy query to get all books from the books table
     books_list = [{'id': book.id, 'title': book.title, 'author': book.author} for book in books]
     return jsonify(books_list)
 
