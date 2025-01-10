@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from flask_restful import Api
-from model.librarydb import book  
+from model.librarydb import Book  
 import random
 from __init__ import app, db 
 

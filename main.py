@@ -45,7 +45,6 @@ from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
 from model.librarydb import Book, initBooks 
-from model.suggest import SuggestedBook, initSuggestedBooks 
 # server only Views
 
 # register URIs for api endpoints

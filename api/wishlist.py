@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from __init__ import db  # Import db object from your Flask app's __init__.py
+from __init__ import app, db  # Import db object from your Flask app's __init__.py
 from model.librarydb import book
 
 # Create a Blueprint for the wishlist functionality
