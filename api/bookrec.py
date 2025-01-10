@@ -1,12 +1,10 @@
 from flask import Flask, jsonify, request, Blueprint
-from flask_cors import CORS
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
 import random
 import time
 
-app = Flask('bookrec_api')
-CORS(app)  # Enable CORS for all routes
+app = Flask(__name__)
 
 bookrec_api = Blueprint('bookrec_api', __name__,
                    url_prefix='/api')
@@ -27,14 +25,14 @@ class Book(db.Model):
     author = db.Column(db.String(100))
     genre = db.Column(db.String(50))
     description = db.Column(db.String(500))
-    image_cover = db.Column(db.String(200))
+    cover_image_url = db.Column(db.String(200))
 
     def to_dict(self):
         return {
             'title': self.title,
             'author': self.author,
             'description': self.description,
-            'image_cover': self.image_cover
+            'cover_image_url': self.cover_image_url
         }
 
 # Helper function to get a random book from the database filtered by genre
@@ -49,8 +47,8 @@ def get_random_book(genre=None):
     return random.choice(books) if books else None
 
 # Endpoint to get a random book
-@bookrec_api.route('/random_book', methods=['GET'])
-def random_book():
+@bookrec_api.route('/random_bookrec', methods=['GET'])
+def random_bookrec():
     genre = request.args.get('genre')  # Get the 'genre' parameter from the request
     print(f"Received genre: {genre}")  # Debug log
     
@@ -70,4 +68,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     
-    app.run(debug=True, host='0.0.0.0', port=5002)
+    app.run(debug=True, host='0.0.0.0', port=5003)
