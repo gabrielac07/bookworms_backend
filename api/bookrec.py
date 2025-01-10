@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, Blueprint
 from flask_cors import CORS
 from flask_restful import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
+from __init__ import app, db 
 import random
 import time
 
