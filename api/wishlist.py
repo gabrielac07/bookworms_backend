@@ -4,7 +4,7 @@ import sqlite3
 # Create a Blueprint for the wishlist functionality
 wishlist_api = Blueprint('wishlist_api', __name__, url_prefix='/api/wishlist')
 
-DATABASE = 'books.db'  # Existing database containing the books table
+DATABASE = 'library.db'  # Use the new library database
 
 def get_db_connection(database):
     """Establish a database connection to the specified database."""

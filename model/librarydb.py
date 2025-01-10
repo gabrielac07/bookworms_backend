@@ -1,6 +1,5 @@
 import jwt
 from sqlite3 import IntegrityError
-from sqlalchemy.ext.declarative import declarative_base
 from flask import Blueprint, request, jsonify, current_app, Response, g
 from flask_restful import Api, Resource
 from sqlalchemy import create_engine, Column, Integer, String, Text, MetaData, Table
@@ -25,6 +24,7 @@ books = Table('books', metadata,
 # Step 3: Create the table in the database
 metadata.create_all(engine)
 # Call the functions to create the database and insert books
+
 books_data = [
     ("Great Expectations", "Charles Dickens", "Classics", "Great Expectations follows the childhood and young adult years of Pip a blacksmith's apprentice in a country village. He suddenly comes into a large fortune (his great expectations) from a mysterious benefactor. and moves to London where he enters high society.", "https://m.media-amazon.com/images/I/715lBsaI4sL.jpg"),
     ("The Outsiders", "S.E. Hinton", "Classics", "Ponyboy, a greaser from the 'wrong' side of town, struggles to find his place in society alongside his friends after personal tragedies.", "https://m.media-amazon.com/images/I/71Bg39CmhoL.jpg"),
