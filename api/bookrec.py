@@ -5,9 +5,6 @@ from __init__ import app, db
 import random
 import time
 
-app = Flask('bookrec_api')
-CORS(app)  # Enable CORS for all routes
-
 bookrec_api = Blueprint('bookrec_api', __name__,
                    url_prefix='/api')
 
