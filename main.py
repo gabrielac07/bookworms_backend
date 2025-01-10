@@ -44,7 +44,8 @@ from model.channel import Channel, initChannels
 from model.post import Post, initPosts
 from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
 from model.vote import Vote, initVotes
-from model.librarydb import book 
+from model.librarydb import Book, initBooks 
+from model.suggest import SuggestedBook, initSuggestedBooks 
 # server only Views
 
 # register URIs for api endpoints
@@ -61,7 +62,6 @@ app.register_blueprint(bookrec_api)
 app.register_blueprint(car_chat_api)
 app.register_blueprint(bookreview_api)
 app.register_blueprint(suggest_api)
-# Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
 app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
@@ -174,6 +174,7 @@ def generate_data():
     initPosts()
     initNestPosts()
     initVotes()
+    initBooks()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -195,6 +196,7 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
+        data['books'] = [book.read() for book in Book.query.all()]
     return data
 
 # Save extracted data to JSON files
