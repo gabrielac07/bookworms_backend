@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, Blueprint
+from flask import jsonify, request, Blueprint
 from flask_restful import Api
 from model.librarydb import Book
 from __init__ import app, db 
@@ -23,10 +23,10 @@ def get_random_bookrec(genre=None):
 # Endpoint to get a random book
 @bookrec_api.route('/random_bookrec', methods=['GET'])
 def random_bookrec():
-    genre = request.args.get('genre')  # Get the 'genre' parameter from the request
+    genre = request.args.get('genre')  # Get the 'genre' parameter from the request 
     print(f"Received genre: {genre}")  # Debug log
     
-    while True:
+    while True: # Loop until a book is found 
         book = get_random_bookrec(genre)
         if book:
             return jsonify({
@@ -35,6 +35,6 @@ def random_bookrec():
             'description': book.description,
             'image_cover': book.cover_image_url
             })
-        else:
+        else: # Retry if no books are found in the database for the requested genre
             print("No books found, retrying in 5 seconds...")
             time.sleep(5)

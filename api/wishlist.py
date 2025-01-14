@@ -1,21 +1,10 @@
 from flask import Blueprint, jsonify, request
 from __init__ import app, db  # Import db object from your Flask app's __init__.py
 from model.librarydb import Book
+from model.wishlist import Wishlist  # Import the Wishlist model
 
 # Create a Blueprint for the wishlist functionality
 wishlist_api = Blueprint('wishlist_api', __name__, url_prefix='/api/wishlist')
-
-# Define the Wishlist model directly in this file
-class Wishlist(db.Model):
-    __tablename__ = 'wishlist'
-
-    id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
-
-    book = db.relationship('Book', backref='wishlist', lazy=True)
-
-    def __repr__(self):
-        return f"<Wishlist(id={self.id}, book_id={self.book_id})>"
 
 # Route to get a dropdown list of books
 @wishlist_api.route('/books', methods=['GET'])
@@ -25,14 +14,14 @@ def get_books():
     books_list = [{'id': book.id, 'title': book.title, 'author': book.author} for book in books]
     return jsonify(books_list)
 
-# Route to get all books in the wishlist (no user associated)
+# Route to get all books in the wishlist 
 @wishlist_api.route('/', methods=['GET'])
 def get_wishlist():
     """Retrieve all books in the wishlist."""
     wishlist_items = Wishlist.query.all()  # Fetch all wishlist entries
     books_in_wishlist = []
     for item in wishlist_items:
-        book = book.query.get(item.book_id)
+        book = Book.query.get(item.book_id)
         if book:
             books_in_wishlist.append({'id': book.id, 'title': book.title, 'author': book.author})
     return jsonify(books_in_wishlist)
@@ -50,7 +39,7 @@ def add_book_to_wishlist():
             return jsonify({"error": "Missing book_id"}), 400
 
         # Check if the book exists in the books database
-        book = book.query.get(book_id)
+        book = Book.query.get(book_id)
         if not book:
             return jsonify({"error": "Book not found"}), 404
 
