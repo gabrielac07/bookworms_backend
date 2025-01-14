@@ -25,7 +25,7 @@ def get_books():
     books_list = [{'id': book.id, 'title': book.title, 'author': book.author} for book in books]
     return jsonify(books_list)
 
-# Route to get all books in the wishlist (no user associated)
+# Route to get all books in the wishlist 
 @wishlist_api.route('/', methods=['GET'])
 def get_wishlist():
     """Retrieve all books in the wishlist."""
