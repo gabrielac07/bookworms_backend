@@ -1,21 +1,10 @@
 from flask import Blueprint, jsonify, request
 from __init__ import app, db  # Import db object from your Flask app's __init__.py
 from model.librarydb import Book
+from model.wishlist import Wishlist  # Import the Wishlist model
 
 # Create a Blueprint for the wishlist functionality
 wishlist_api = Blueprint('wishlist_api', __name__, url_prefix='/api/wishlist')
-
-# Define the Wishlist model directly in this file
-class Wishlist(db.Model):
-    __tablename__ = 'wishlist'
-
-    id = db.Column(db.Integer, primary_key=True)
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
-
-    book = db.relationship('Book', backref='wishlist', lazy=True)
-
-    def __repr__(self):
-        return f"<Wishlist(id={self.id}, book_id={self.book_id})>"
 
 # Route to get a dropdown list of books
 @wishlist_api.route('/books', methods=['GET'])
