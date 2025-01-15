@@ -49,6 +49,7 @@ from model.librarydb import Book, initBooks
 from model.reaction import Reaction, initReactions
 from model.wishlist import Wishlist
 from model.suggest import SuggestedBook
+from model.bookpurchasedb import CartItem
 # server only Views
 
 # register URIs for api endpoints
