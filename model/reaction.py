@@ -7,12 +7,12 @@ from sqlite3 import IntegrityError
 # Book model definition
 class Reaction(db.Model):
     __tablename__ = 'reactions'
-    id = db.Column(String, primary_key=True)
-    # title = db.Column(String, nullable=False)
-    # author = db.Column(String, nullable=False)
-    # genre = db.Column(String)
-    # description = db.Column(Text)
-    # cover_image_url = db.Column(String)
+    id = db.Column(Integer, primary_key=True)
+    title = db.Column(String, nullable=False)
+    author = db.Column(String, nullable=False)
+    genre = db.Column(String)
+    description = db.Column(Text)
+    cover_image_url = db.Column(String)
 
 # Book data to insert
 def initReactions(): 
