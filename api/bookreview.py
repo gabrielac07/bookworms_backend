@@ -26,6 +26,7 @@ def random_book():
     if book:
         # If a random book is found, return its details as JSON
         return jsonify({
+            'id' : book.id,
             'title': book.title,
             'author': book.author,
             'genre': book.genre,

@@ -47,7 +47,6 @@ from model.nestPost import NestPost, initNestPosts # Justin added this, custom f
 from model.vote import Vote, initVotes
 from model.librarydb import Book, initBooks 
 from model.reaction import Reaction, initReactions
-from model.suggest import SuggestedBook, initSuggestedBooks 
 from model.wishlist import Wishlist
 # server only Views
 
