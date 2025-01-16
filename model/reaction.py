@@ -8,62 +8,15 @@ from sqlite3 import IntegrityError
 class Reaction(db.Model):
     __tablename__ = 'reactions'
     id = db.Column(Integer, primary_key=True)
-    reaction_type = db.Column(String, nullable=False)
-    user_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
-    post_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
-#    genre = db.Column(String)
-#    description = db.Column(Text)
-#    cover_image_url = db.Column(String)
+    _reaction_type = db.Column(String, nullable=False)
+    _user_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
+    _post_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
 
 
     def __init__(self, reaction_type, user_id, post_id):
-        """
-        Constructor to initialize a vote.
-
-        Args:
-            vote_type (str): Type of the vote, either "upvote" or "downvote".
-            user_id (int): ID of the user who cast the vote.
-            post_id (int): ID of the post that received the vote.
-        """
         self._reaction_type = reaction_type
         self._user_id = user_id
         self._post_id = post_id
-
-    def create(self):
-        """
-        Add the vote to the database and commit the transaction.
-        """
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            raise e
-
-    def read(self):
-        """
-        Retrieve the vote data as a dictionary.
-
-        Returns:
-            dict: Dictionary with vote information.
-        """
-        return {
-            "id": self.id,
-            "vote_type": self._reaction_type,
-            "user_id": self._user_id,
-            "post_id": self._post_id
-        }
-
-    def delete(self):
-        """
-        Remove the vote from the database and commit the transaction.
-        """
-        try:
-            db.session.delete(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            raise e
 
 
 # reaction data to insert
@@ -71,6 +24,11 @@ def initReactions():
     reactions_data = [
         "👍", "❤️", "😂", "🎉", "😢", "😡"
     ]  
+
+    with app.app_context():
+        # Create database tables if they don't exist
+        db.create_all()
+        # Optionally, add some test data (replace with actual values as needed)
 
     # Optionally, add some test data (replace with actual values as needed)
     reactions = [
@@ -88,7 +46,7 @@ def initReactions():
             print(f"Duplicate or error: {repr(react)}")
 
 
-# Create the tables and initialize data
-with app.app_context():
-    db.create_all()  # Create tables
-    initReactions()  # Initialize the comments data
+# # Create the tables and initialize data
+# with app.app_context():
+#     db.create_all()  # Create tables
+#     initReactions()  # Initialize the comments data
