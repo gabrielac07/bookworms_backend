@@ -45,11 +45,6 @@ def random_book():
 @bookreview_api.route('/comments', methods=['GET', 'POST'])
 def manage_comments():
     if request.method == 'GET':
-        """
-        This handles the GET request to retrieve comments.
-        If 'book_id' is provided, it returns comments for that specific book.
-        Otherwise, it returns all comments.
-        """
         book_id = request.args.get('book_id')
 
         if book_id:
@@ -72,10 +67,6 @@ def manage_comments():
                 return jsonify({'message': 'No comments available'}), 404
 
     elif request.method == 'POST':
-        """
-        This handles the POST request to add a new comment.
-        It expects a JSON body with book_id, username, and comment_text.
-        """
         try:
             # Get the JSON data from the request body
             data = request.get_json()
