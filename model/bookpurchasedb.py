@@ -1,4 +1,4 @@
-from flask_restful import Api, Resource, jsonify, request
+from flask_restful import Api, Resource
 from sqlalchemy import Text, JSON
 from __init__ import app, db
 from sqlalchemy import Column, Integer, String, Text
