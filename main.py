@@ -47,8 +47,11 @@ from model.nestPost import NestPost, initNestPosts # Justin added this, custom f
 from model.vote import Vote, initVotes
 from model.librarydb import Book, initBooks 
 from model.reaction import Reaction, initReactions
-from model.wishlist import Wishlist
+from model.commentsdb import Comments, initComments
 from model.suggest import SuggestedBook
+from model.bookpurchasedb import CartItem, init_books_in_cart
+from model.wishlist import Wishlist
+from model.bookrecdb import SaveBookRec, initSavedBookRecs
 # server only Views
 
 # register URIs for api endpoints
@@ -181,6 +184,8 @@ def generate_data():
     initVotes()
     initBooks()
     initReactions()
+    initSavedBookRecs()
+    init_books_in_cart()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -204,7 +209,7 @@ def extract_data():
         data['posts'] = [post.read() for post in Post.query.all()]
         data['books'] = [book.read() for book in Book.query.all()]
         data['reaction'] = [reaction.read() for reaction in Reaction.query.all()]
-
+        data['cart_items'] = [cart_item.read() for cart_item in CartItem.query.all()]
     return data
 
 # Save extracted data to JSON files
@@ -219,7 +224,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'cart_items']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -231,7 +236,8 @@ def restore_data(data):
         _ = Section.restore(data['sections'])
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
-        _ = Post.restore(data['posts'])
+        _ = Comments.restore(data['comments'])
+        _ = SaveBookRec.restore(data['savedbookrecs'])
     print("Data restored to the new database.")
 
 # Define a command to backup data
