@@ -48,7 +48,6 @@ from model.vote import Vote, initVotes
 from model.librarydb import Book, initBooks 
 from model.reaction import Reaction, initReactions
 from model.wishlist import Wishlist
-from model.commentsdb import Comments, initComments
 # server only Views
 
 # register URIs for api endpoints
