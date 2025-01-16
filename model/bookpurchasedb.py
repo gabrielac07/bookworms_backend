@@ -9,11 +9,11 @@ from model.user import User
 # Database model for the cart
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(String, db.ForeignKey(Book.title), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    username = db.Column(String, db.ForeignKey(User._name), nullable=False)
+    id = Column(db.Integer, primary_key=True)
+    title = Column(String, db.ForeignKey(Book.title), nullable=False)
+    price = Column(db.Float, nullable=False)
+    quantity = Column(db.Integer, nullable=False)
+    username = Column(String, db.ForeignKey(User._name), nullable=False)
 
     def create(self):
         try:
@@ -54,19 +54,20 @@ def init_books_in_cart():
         }
     ]
 
-    for book in books_in_cart:
-        # Check for duplicate entries to avoid IntegrityError
-        existing_cart_item = CartItem.query.filter_by(title=book["title"], username=book["username"]).first()
-        if not existing_cart_item:
-            new_cart_item = CartItem(
-                title=book["title"],
-                price=book["price"],
-                quantity=book["quantity"],
-                username=book["username"]
-            )
-            db.session.add(new_cart_item)
+    # for book in books_in_cart:
+    #     # Check for duplicate entries to avoid IntegrityError
+    #     existing_cart_item = CartItem.query.filter_by(title=book["title"], username=book["username"]).first()
+    #     if not existing_cart_item:
+    #         new_cart_item = CartItem(
+    #             title=book["title"],
+    #             price=book["price"],
+    #             quantity=book["quantity"],
+    #             username=book["username"]
+    #         )
+    #         db.session.add(new_cart_item)
 
     try:
+        db.session.add_all(books_in_cart)  # Add all the books to the database
         db.session.commit()  # Commit the changes
     except IntegrityError:
         db.session.rollback()  # Rollback if there is an integrity error
