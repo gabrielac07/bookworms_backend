@@ -10,7 +10,7 @@ bookpurchase_api = Blueprint('bookpurchase_api', __name__, url_prefix='/api')
 api = Api(bookpurchase_api)
 
 # Get all items in the cart
-@app.route('/api/cart', methods=['GET'])
+@app.route('/cart', methods=['GET'])
 def get_cart():
     items = CartItem.query.all()
     total_items = sum(item.quantity for item in items)
@@ -23,7 +23,7 @@ def get_cart():
     })
 
 # Add an item to the cart
-@app.route('/api/cart', methods=['POST'])
+@app.route('/cart', methods=['POST'])
 def add_to_cart():
     data = request.get_json()
     if not all(k in data for k in ('id', 'title', 'price', 'quantity')):
@@ -45,7 +45,7 @@ def add_to_cart():
     return jsonify({"message": "Item added to cart successfully."}), 201
 
 # Update an item's quantity in the cart
-@app.route('/api/cart/<int:item_id>', methods=['PUT'])
+@app.route('/cart/<int:item_id>', methods=['PUT'])
 def update_cart_item(item_id):
     data = request.get_json()
     if 'quantity' not in data:
@@ -63,7 +63,7 @@ def update_cart_item(item_id):
     return jsonify({"message": "Item quantity updated successfully."})
 
 # Remove an item from the cart
-@app.route('/api/cart/<int:item_id>', methods=['DELETE'])
+@app.route('/cart/<int:item_id>', methods=['DELETE'])
 def delete_cart_item(item_id):
     item = CartItem.query.get(item_id)
     if not item:
@@ -74,7 +74,7 @@ def delete_cart_item(item_id):
     return jsonify({"message": "Item removed from cart successfully."})
 
 # Clear the entire cart
-@app.route('/api/cart', methods=['DELETE'])
+@app.route('/cart', methods=['DELETE'])
 def clear_cart():
     CartItem.query.delete()
     db.session.commit()

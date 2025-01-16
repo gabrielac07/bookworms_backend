@@ -38,7 +38,8 @@ def init_books_in_cart():
         {"id": 1, "title": "1984", "price": 15.00, "quantity": 2, "_name": "Avika"},
         {"id": 2, "title": "The Hobbit", "price": 12.00, "quantity": 1, "_name": "Soumini"},
         {"id": 3, "title": "The Outsiders", "price": 10.00, "quantity": 4, "_name": "Aarush"},
-        {"id": 4, "title": "A Game of Thrones", "price": 13.00, "quantity": 1, "_name": "Aditi"}
+        {"id": 4, "title": "A Game of Thrones", "price": 13.00, "quantity": 1, "_name": "Aditi"},
+        {"id": 5, "title": "The Nightingale", "price": 16.00, "quantity": 2, "_name": "Thomas Edison"}
     ]
 
     for book in books_in_cart:
