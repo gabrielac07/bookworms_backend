@@ -48,6 +48,7 @@ from model.vote import Vote, initVotes
 from model.librarydb import Book, initBooks 
 from model.reaction import Reaction, initReactions
 from model.wishlist import Wishlist
+from model.commentsdb import Comments, initComments
 # server only Views
 
 # register URIs for api endpoints
@@ -230,7 +231,7 @@ def restore_data(data):
         _ = Section.restore(data['sections'])
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
-        _ = Post.restore(data['posts'])
+        _ = Comments.restore(data['comments'])
     print("Data restored to the new database.")
 
 # Define a command to backup data
