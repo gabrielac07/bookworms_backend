@@ -32,6 +32,7 @@ from api.bookreview import bookreview_api
 from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
+from api.bookpurchase import bookpurchase_api
 
 
 
@@ -49,7 +50,7 @@ from model.librarydb import Book, initBooks
 from model.reaction import Reaction, initReactions
 from model.commentsdb import Comments, initComments
 from model.suggest import SuggestedBook
-from model.bookpurchasedb import CartItem
+from model.bookpurchasedb import CartItem, init_books_in_cart
 from model.wishlist import Wishlist
 from model.bookrecdb import SaveBookRec, initSavedBookRecs
 # server only Views

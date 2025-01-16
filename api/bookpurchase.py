@@ -2,7 +2,8 @@ from flask import Blueprint, jsonify, request
 from flask_restful import Api
 from model.librarydb import Book  
 import random
-from __init__ import app, db, CartItem
+from __init__ import app, db
+from model.bookpurchasedb import CartItem 
 
 # Avika please ADD COMMENTS because otherwise you're going to forget wth you're doing
 bookpurchase_api = Blueprint('bookpurchase_api', __name__, url_prefix='/api')
