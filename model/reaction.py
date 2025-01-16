@@ -4,39 +4,49 @@ from __init__ import app, db
 from sqlalchemy import Column, Integer, String, Text
 from sqlite3 import IntegrityError
 
-# Book model definition
+# Reaction model definition
 class Reaction(db.Model):
     __tablename__ = 'reactions'
     id = db.Column(Integer, primary_key=True)
-    title = db.Column(String, nullable=False)
-    author = db.Column(String, nullable=False)
-    genre = db.Column(String)
-    description = db.Column(Text)
-    cover_image_url = db.Column(String)
+    _reaction_type = db.Column(String, nullable=False)
+    _user_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
+    _post_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
 
-# Book data to insert
+
+    def __init__(self, reaction_type, user_id, post_id):
+        self._reaction_type = reaction_type
+        self._user_id = user_id
+        self._post_id = post_id
+
+
+# reaction data to insert
 def initReactions(): 
     reactions_data = [
         "👍", "❤️", "😂", "🎉", "😢", "😡"
     ]  
-  
-    # Insert the books data into the table
-    for reaction in reactions_data:
-        new_reaction = Reaction(
-            id=reaction[0],
-        )
-        db.session.add(new_reaction)
-    
-    try:
-        db.session.commit()
-    except IntegrityError:
-        db.session.rollback()
-        print("IntegrityError: Could be a duplicate entry or violation of database constraints.")
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error: {e}")
 
-# Create the tables before inserting data
-with app.app_context():
-    db.create_all()
-    initReactions()
+    with app.app_context():
+        # Create database tables if they don't exist
+        db.create_all()
+        # Optionally, add some test data (replace with actual values as needed)
+
+    # Optionally, add some test data (replace with actual values as needed)
+    reactions = [
+        Reaction(reaction_type='😢', user_id=1, post_id=1),
+        Reaction(reaction_type='❤️', user_id=2, post_id=1),
+    ]
+        
+    for react in reactions:
+        try:
+            db.session.add(react)
+            db.session.commit()
+            print(f"Record created: {repr(react)}")
+        except IntegrityError:
+            db.session.rollback()
+            print(f"Duplicate or error: {repr(react)}")
+
+
+# # Create the tables and initialize data
+# with app.app_context():
+#     db.create_all()  # Create tables
+#     initReactions()  # Initialize the comments data
