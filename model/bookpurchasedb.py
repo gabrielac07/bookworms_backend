@@ -15,15 +15,22 @@ class CartItem(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     username = db.Column(String, db.ForeignKey(User._name), nullable=False)
 
-    def to_dict(self):
+    def create(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+        
+    def read(self):
         return {
             'id': self.id,
-            'title': self.title,
-            'price': self.price,
+            'title' : self.title,
             'quantity': self.quantity,
             'username': self.username
         }
-
+        
 # Initialize cart items
 def init_books_in_cart():
     books_in_cart = [

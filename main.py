@@ -32,7 +32,6 @@ from api.bookreview import bookreview_api
 from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
-from api.bookpurchase import bookpurchase_api
 
 
 
