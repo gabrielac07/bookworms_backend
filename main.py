@@ -51,6 +51,7 @@ from model.commentsdb import Comments, initComments
 from model.suggest import SuggestedBook
 from model.bookpurchasedb import CartItem
 from model.wishlist import Wishlist
+from model.bookrecdb import SaveBookRec, initSavedBookRecs
 # server only Views
 
 # register URIs for api endpoints
@@ -183,6 +184,7 @@ def generate_data():
     initVotes()
     initBooks()
     initReactions()
+    initSavedBookRecs()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -234,6 +236,7 @@ def restore_data(data):
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
         _ = Comments.restore(data['comments'])
+        _ = SaveBookRec.restore(data['savedbookrecs'])
     print("Data restored to the new database.")
 
 # Define a command to backup data
