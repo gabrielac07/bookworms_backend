@@ -29,6 +29,41 @@ class Reaction(db.Model):
         self._user_id = user_id
         self._post_id = post_id
 
+    def create(self):
+        """
+        Add the vote to the database and commit the transaction.
+        """
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    def read(self):
+        """
+        Retrieve the vote data as a dictionary.
+
+        Returns:
+            dict: Dictionary with vote information.
+        """
+        return {
+            "id": self.id,
+            "vote_type": self._reaction_type,
+            "user_id": self._user_id,
+            "post_id": self._post_id
+        }
+
+    def delete(self):
+        """
+        Remove the vote from the database and commit the transaction.
+        """
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
 
 
 # reaction data to insert
@@ -36,22 +71,24 @@ def initReactions():
     reactions_data = [
         "👍", "❤️", "😂", "🎉", "😢", "😡"
     ]  
-  
-    with app.app_context():
-        # Create database tables if they don't exist
-        db.create_all()
 
-        # Optionally, add some test data (replace with actual values as needed)
-        reactions = [
-            Reaction(vote_type='😢', user_id=1, post_id=1),
-            Reaction(vote_type='❤️', user_id=2, post_id=1),
-        ]
+    # Optionally, add some test data (replace with actual values as needed)
+    reactions = [
+        Reaction(reaction_type='😢', user_id=1, post_id=1),
+        Reaction(reaction_type='❤️', user_id=2, post_id=1),
+    ]
         
-        for react in reactions:
-            try:
-                db.session.add(react)
-                db.session.commit()
-                print(f"Record created: {repr(react)}")
-            except IntegrityError:
-                db.session.rollback()
-                print(f"Duplicate or error: {repr(react)}")
+    for react in reactions:
+        try:
+            db.session.add(react)
+            db.session.commit()
+            print(f"Record created: {repr(react)}")
+        except IntegrityError:
+            db.session.rollback()
+            print(f"Duplicate or error: {repr(react)}")
+
+
+# Create the tables and initialize data
+with app.app_context():
+    db.create_all()  # Create tables
+    initReactions()  # Initialize the comments data
