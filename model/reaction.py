@@ -8,9 +8,9 @@ from sqlite3 import IntegrityError
 class Reaction(db.Model):
     __tablename__ = 'reactions'
     id = db.Column(Integer, primary_key=True)
-    _reaction_type = db.Column(String, nullable=False)
-    _user_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
-    _user_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
+    reaction_type = db.Column(String, nullable=False)
+    user_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
+    post_id = db.Column(String, db.ForeignKey('users.id'), nullable=False)
 #    genre = db.Column(String)
 #    description = db.Column(Text)
 #    cover_image_url = db.Column(String)
