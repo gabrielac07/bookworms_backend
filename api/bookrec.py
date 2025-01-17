@@ -1,6 +1,7 @@
 from flask import jsonify, request, Blueprint
 from flask_restful import Api
 from model.librarydb import Book
+from model.bookrecdb import SaveBookRec
 from __init__ import app, db 
 import random
 import time
@@ -38,3 +39,29 @@ def random_bookrec():
         else: # Retry if no books are found in the database for the requested genre
             print("No books found, retrying in 5 seconds...")
             time.sleep(5)
+
+# Endpoint to save a book recommendation (This is what I'm using for the table checkpoint on Thurs/Fri)
+@bookrec_api.route("/add_bookrec", methods=['POST'])
+def add_book():
+    data = request.get_json()
+    title = data.get('title')
+    author = data.get('author')
+    genre = data.get('genre')
+    description = data.get('description')
+    cover_image_url = data.get('cover_image_url')
+
+    if not title or not author:
+        return jsonify({"error": "Title and author are required"}), 400
+
+    new_book = SaveBookRec(
+        title=title,
+        author=author,
+        genre=genre,
+        description=description,
+        cover_image_url=cover_image_url
+    )
+
+    db.session.add(new_book)
+    db.session.commit()
+    
+    return jsonify({"message": "Book added successfully"}), 201

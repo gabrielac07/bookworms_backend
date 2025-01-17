@@ -29,6 +29,7 @@ def initSavedBookRecs(): # Function to initialize the saved book recommendations
     ]
 
 # insert the books data into the table
+    '''
     for book in saved_bookrecs_data:
         if not Book.query.filter_by(title=book[0]).first():  # Check if book already exists
             save_newbookrec = SaveBookRec(
@@ -39,14 +40,12 @@ def initSavedBookRecs(): # Function to initialize the saved book recommendations
                 cover_image_url=book[4]
             )
             db.session.add(save_newbookrec)  # Add the book to session
-
-    '''new_book = Book(
-        title=title,
-        author=author,
-        genre=genre,
-        description=description,
-        cover_image_url=cover_image_url
-    )'''
+    '''
+    for title, author, genre, description, cover_image_url in saved_bookrecs_data:
+        # Check if the book already exists in the database
+        if not SaveBookRec.query.filter_by(title=title, author=author).first():
+            new_book = SaveBookRec(title=title, author=author, genre=genre, description=description, cover_image_url=cover_image_url)
+            db.session.add(new_book)
 
     try: # Try to add the new book to the database
         #db.session.add(save_newbookrec)
@@ -55,16 +54,8 @@ def initSavedBookRecs(): # Function to initialize the saved book recommendations
     except Exception as e: # If an error occurs, rollback the changes and raise the error
         db.session.rollback() # Rollback the changes
         raise e # Raise the error
-'''
-def get_random_bookrec(): 
-    try:
-        suggested_books_query = SaveBookRec.query.all()
-        return random.choice(suggested_books_query) if suggested_books_query else None
-    except Exception as e:
-        print(f"Error while fetching random book: {e}")
-        return None'''
 
 # Create the table before inserting data
 with app.app_context():
     db.create_all()
-    initSavedBookRecs()
+    initSavedBookRecs() # Initialize the saved book recommendations
