@@ -32,10 +32,10 @@ from api.bookreview import bookreview_api
 from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
-
-
-
 from api.vote import vote_api
+
+
+
 # database Initialization functions
 from model.carChat import CarChat
 from model.user import User, initUsers
@@ -48,7 +48,7 @@ from model.vote import Vote, initVotes
 from model.librarydb import Book, initBooks 
 from model.reaction import Reaction, initReactions
 from model.commentsdb import Comments, initComments
-from model.suggest import SuggestedBook
+from model.suggest import SuggestedBook, initSuggest
 from model.bookpurchasedb import CartItem, init_books_in_cart
 from model.wishlist import Wishlist
 from model.bookrecdb import SaveBookRec, initSavedBookRecs
@@ -186,6 +186,7 @@ def generate_data():
     initReactions()
     initSavedBookRecs()
     init_books_in_cart()
+    initSuggest()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -207,8 +208,7 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
-        data['books'] = [book.read() for book in Book.query.all()]
-        data['reaction'] = [reaction.read() for reaction in Reaction.query.all()]
+        data['suggestions'] = [suggestion.read() for suggestion in SuggestedBook.query.all()]
         data['cart_items'] = [cart_item.read() for cart_item in CartItem.query.all()]
         data['savedbookrecs'] = [savedbookrec.read() for savedbookrec in SaveBookRec.query.all()]
     return data
@@ -225,7 +225,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'cart_items', 'savedbookrecs']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'cart_items', 'suggestions', 'savedbookrecs']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -237,8 +237,7 @@ def restore_data(data):
         _ = Section.restore(data['sections'])
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
-        _ = Comments.restore(data['comments'])
-        _ = SaveBookRec.restore(data['savedbookrecs'])
+        _ = SuggestedBook.restore(data['suggestions'])
     print("Data restored to the new database.")
 
 # Define a command to backup data
