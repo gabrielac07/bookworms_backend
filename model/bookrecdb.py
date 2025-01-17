@@ -13,12 +13,41 @@ class SaveBookRec(db.Model): # Class to save a book recommendation
     description = db.Column(Text)
     cover_image_url = db.Column(String)
 
-    def __init__(self, title, author, genre, description, cover_image_url):
+    def __init__(self, title, author, genre, description, cover_image_url): # Constructor to initialize the book recommendation
         self.title = title
         self.author = author
         self.genre = genre
         self.description = description
         self.cover_image_url = cover_image_url
+
+    def read(self): # Function to read the book recommendation
+        return {
+            'id': self.id,
+            'title': self.title,
+            'author': self.author,
+            'genre': self.genre,
+            'description': self.description,
+            'cover_image_url': self.cover_image_url
+        }
+    
+    @classmethod # Class method to restore the book recommendation
+    def restore(cls, data):
+        for item in data:
+            existing_record = cls.query.filter_by(title=item['title'], author=item['author']).first()
+            if existing_record:
+                existing_record.genre = item['genre']
+                existing_record.description = item['description']
+                existing_record.cover_image_url = item['cover_image_url']
+            else: # If the book recommendation does not exist, create a new record
+                new_record = cls(
+                    title=item['title'],
+                    author=item['author'],
+                    genre=item['genre'],
+                    description=item['description'],
+                    cover_image_url=item['cover_image_url']
+                )
+                db.session.add(new_record)
+        db.session.commit()
 
 # Static data
 def initSavedBookRecs(): # Function to initialize the saved book recommendations
