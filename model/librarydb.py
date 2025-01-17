@@ -4,7 +4,6 @@ from __init__ import app, db
 from sqlalchemy import Column, Integer, String, Text
 from sqlite3 import IntegrityError
 
-# Book model definition
 class Book(db.Model):
     __tablename__ = 'books'
     id = db.Column(Integer, primary_key=True)
@@ -14,7 +13,7 @@ class Book(db.Model):
     description = db.Column(Text)
     cover_image_url = db.Column(String)
 
-# Book data to insert
+# static book data 
 def initBooks(): 
     books_data = [
         ("Great Expectations", "Charles Dickens", "Classics", "Great Expectations follows the childhood and young adult years of Pip a blacksmith's apprentice in a country village. He suddenly comes into a large fortune (his great expectations) from a mysterious benefactor. and moves to London where he enters high society.", "https://m.media-amazon.com/images/I/715lBsaI4sL.jpg"),
@@ -60,7 +59,7 @@ def initBooks():
         ("Two Can Keep A Secret", "Karen M. McManus", "Mystery", "Two Can Keep a Secret is a story of two high schoolers told in alternating first-person point of view. The first is Ellery Corcoran, who has moved to live with her grandmother in the small town of Echo Ridge with her twin brother, Ezra, after their actress mother, Sadie, is forced into rehab.", "https://m.media-amazon.com/images/I/91-+JSk4XbL.jpg"),
     ]  
   
- # Insert the books data into the table
+ # insert the books data into the table
     for book in books_data:
         if not Book.query.filter_by(title=book[0]).first():  # Check if book already exists
             new_book = Book(
@@ -72,7 +71,7 @@ def initBooks():
             )
             db.session.add(new_book)  # Add the book to session
     
-    # Commit the transaction to the database
+    # commit transaction to the database
     try:
         db.session.commit()  # Commit the changes
     except IntegrityError:
@@ -82,7 +81,7 @@ def initBooks():
         db.session.rollback()  # Rollback for other errors
         print(f"Error: {e}")
 
-# Create the tables before inserting data
+# create the tables before inserting data
 with app.app_context():
     db.create_all()  # Create tables
     initBooks()  # Initialize the books data
