@@ -56,3 +56,20 @@ def add_book_to_wishlist():
         return jsonify({"message": "Book added to wishlist"}), 201
 
     return jsonify({"error": "Request must be JSON"}), 415
+
+# Route to delete a book from the wishlist
+@wishlist_api.route('/<int:book_id>', methods=['DELETE'])
+def delete_book_from_wishlist(book_id):
+    """Delete a book from the wishlist."""
+    wishlist_item = Wishlist.query.filter_by(book_id=book_id).first()
+
+    if not wishlist_item:
+        return jsonify({"error": "Book not found in wishlist"}), 404
+
+    try:
+        db.session.delete(wishlist_item)
+        db.session.commit()
+        return jsonify({"message": "Book removed from wishlist"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
