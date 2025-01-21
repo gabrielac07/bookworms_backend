@@ -26,8 +26,8 @@ def get_cart():
 @app.route('/cart', methods=['POST'])
 def add_to_cart():
     data = request.get_json()
-    if not all(k in data for k in ('id', 'title', 'price', 'quantity')):
-        return jsonify({"error": "All fields (id, title, price, quantity) are required."}), 400
+    if not all(k in data for k in ('id', 'title', 'price', 'quantity', '_name')):
+        return jsonify({"error": "All fields (id, title, price, quantity, _name) are required."}), 400
 
     item = CartItem.query.get(data['id'])
     if item:
@@ -37,7 +37,8 @@ def add_to_cart():
             id=data['id'],
             title=data['title'],
             price=data['price'],
-            quantity=data['quantity']
+            quantity=data['quantity'],
+            username=data['_name']
         )
         db.session.add(item)
 

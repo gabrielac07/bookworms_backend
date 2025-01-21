@@ -32,7 +32,7 @@ from api.bookreview import bookreview_api
 from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
-
+from api.bookpurchase import bookpurchase_api # Avika added this, book purchase for her website
 
 
 from api.vote import vote_api
@@ -69,6 +69,7 @@ app.register_blueprint(car_chat_api)
 app.register_blueprint(bookreview_api)
 app.register_blueprint(suggest_api)
 app.register_blueprint(reaction_api)
+app.register_blueprint(bookpurchase_api) # Avika added this, book purchase for her website
 # Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
 app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
