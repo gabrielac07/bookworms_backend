@@ -242,6 +242,7 @@ def restore_data(data):
         _ = Channel.restore(data['channels'])
         _ = SuggestedBook.restore(data['suggestions'])
         _ = Wishlist.restore(data['wishlist'])  # Fixed
+        _ = CartItem.restore(data['cart_items'])
 
     print("Data restored to the new database.")
 
