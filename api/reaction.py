@@ -2,8 +2,6 @@ from flask import Blueprint, request, jsonify, current_app, Response, g, Flask
 from flask_restful import Api, Resource  # used for REST API building
 from __init__ import app
 
-# app = Flask(__name__)
-
 reaction_api = Blueprint('reaction_api', __name__, url_prefix='/api')
 
 
