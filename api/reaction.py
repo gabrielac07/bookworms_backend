@@ -20,41 +20,14 @@ def add_reaction():
     reaction_type = data.get("reaction_type")
     post_id = data.get("post_id")
 
-    '''
     try:
         # Create and add the message_reaction
-        message_reaction = Reaction(user_id=user_id, reaction_type=reaction_type)
+        message_reaction = Reaction(reaction_type=reaction_type, user_id=user_id, post_id=post_id)
         message_reaction.create()
         return jsonify({'message': 'Reaction added successfully to post'}), 201
     except Exception as e:
         return jsonify({'error': 'Failed to add reaction', 'message': str(e)}), 500
-    '''
 
-    if not user_id or not reaction_type:
-        return jsonify({"error": "Message ID and reaction are required"}), 400
-
-    if reaction_type not in emojis:
-        return jsonify({"error": f"reaction_type '{reaction_type}' not supported"}), 400
-
-    # Initialize message reactions if not present
-    if user_id not in messages:
-        messages[user_id] = {"reaction_type": {}}
-
-    # Update the reaction count
-#    reactions = messages[user_id]["reactions"]
-#    reactions[reaction] = reactions.get(reaction, 0) + 1
-    reaction_type = Reaction(reaction_type=reaction_type, user_id=user_id, post_id=post_id)
-    reaction_type.create()
-    
-    return jsonify({"message": "Reaction added successfully", "data": messages[user_id]}), 200
-
-# Endpoint to get reactions for a specific message
-# @reaction_api.route('/get_reactions/<user_id>', methods=['GET'])
-# def get_reactions(user_id):
-#     if user_id not in messages:
-#         return jsonify({"error": "Message not found"}), 404
-
-#     return jsonify({"user_id": user_id, "reactions": messages[user_id]["reactions"]}), 200
 
 # Endpoint to get available emojis
 @reaction_api.route('/get_emojis', methods=['GET'])
