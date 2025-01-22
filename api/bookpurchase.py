@@ -8,7 +8,7 @@ from model.bookpurchasedb import CartItem  # Import your CartItem model
 bookpurchase_api = Blueprint('bookpurchase_api', __name__, url_prefix='/api')
 api = Api(bookpurchase_api)
 
-# 1. Get all items in the cart
+# 1. Get all items in the cart (R)
 @bookpurchase_api.route('/cart', methods=['GET'])
 def get_cart():
     """Fetch all items in the cart along with total price and quantity."""
@@ -23,7 +23,7 @@ def get_cart():
     })
 
 
-# 2. Add an item to the cart
+# 2. Add an item to the cart (C)
 @bookpurchase_api.route('/cart', methods=['POST'])
 def add_to_cart():
     """Add a new item to the cart or update the quantity if it already exists."""
@@ -54,7 +54,7 @@ def add_to_cart():
     return jsonify({"message": "Item added to cart successfully."}), 201
 
 
-# 3. Update an item's quantity in the cart
+# 3. Update an item's quantity in the cart (U)
 @bookpurchase_api.route('/cart/<int:item_id>', methods=['PUT'])
 def update_cart_item(item_id):
     """Update the quantity of a specific item in the cart."""
@@ -79,7 +79,7 @@ def update_cart_item(item_id):
     return jsonify({"message": "Item quantity updated successfully."})
 
 
-# 4. Remove an item from the cart
+# 4. Remove an item from the cart (D)
 @bookpurchase_api.route('/cart/<int:item_id>', methods=['DELETE'])
 def delete_cart_item(item_id):
     """Remove a specific item from the cart."""
@@ -103,6 +103,3 @@ def clear_cart():
     db.session.commit()
     return jsonify({"message": "Cart cleared successfully."})
 
-
-# Register the Blueprint with the Flask app
-app.register_blueprint(bookpurchase_api)
