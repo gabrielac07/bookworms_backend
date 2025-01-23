@@ -136,7 +136,7 @@ def initSuggest():
         
     # tester data
     suggest_data = [
-        SuggestedBook(title="The Hunger Games", author="Suzanne Collins", genre="Dystopian", description="The Hunger Games follows Katniss Everdeen as she is forced to fight in a yearly gladiatorial contest. Katniss's struggle and ultimate survival, along with Peeta Mellark's, sparks a revolution to overthrow the tyrannical Capitol.", cover_image_url="https://upload.wikimedia.org/wikipedia/en/d/dc/The_Hunger_Games.jpg"),
+        SuggestedBook(title="The Raven Boys", author="Maggie Stiefvater", genre="Fantasy", description="A young adult fantasy novel about a girl from a family of clairvoyants, the boys she befriends, and how their lives are intertwined along their journey to wake a slumbering king.", cover_image_url="https://m.media-amazon.com/images/I/71s5v4HfFjL._AC_UF1000,1000_QL80_.jpg"),
         SuggestedBook(title="Catch-22", author="Joseph Heller", genre="Classics", description="The work centres on Captain John Yossarian, an American bombardier stationed on a Mediterranean island during World War II, and chronicles his desperate attempts to stay alive.", cover_image_url="https://d28hgpri8am2if.cloudfront.net/book_images/cvr9781451621174_9781451621174_hr.jpg")
     ]
 

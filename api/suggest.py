@@ -54,6 +54,29 @@ def add_books_bulk():
     return jsonify(results), 201
 
 # Endpoint to fetch a random suggested book
+@suggest_api.route('/book', methods=['GET'])
+def get_suggestion():
+    try:
+        # Query all suggested books
+        books = SuggestedBook.query.all()
+
+        # Convert the list of book objects to a list of dictionaries
+        books_data = [
+            {
+                'title': book.title,
+                'author': book.author,
+                'genre': book.genre,
+                'description': book.description,
+                'cover_image_url': book.cover_image_url
+            }
+            for book in books
+        ]
+
+        return jsonify(books_data), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch books', 'message': str(e)}), 500
+
+# Endpoint to fetch a random suggested book
 @suggest_api.route('/random', methods=['GET'])
 def random_book():
     book = SuggestedBook.get_random_suggested_book()
