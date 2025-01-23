@@ -33,9 +33,9 @@ def get_comments_for_book(book_id=None):
         "comment_text": comment.comment_text
     } for comment in comments_query]
 
+# Existing GET Random Book Route
 @bookreview_api.route('/random_book', methods=['GET'])
 def random_book():
-    # Handle GET request to fetch random book
     book = get_random_book()
     if book:
         comments = get_comments_for_book(book_id=book.id)
@@ -51,6 +51,7 @@ def random_book():
     else:
         return jsonify({'error': 'No books found'}), 404
 
+# Comments Route (GET, POST, PUT, DELETE)
 @bookreview_api.route('/comments', methods=['GET', 'POST'])
 def manage_comments():
     if request.method == 'GET':
@@ -80,7 +81,7 @@ def manage_comments():
             if not book:
                 return jsonify({'error': 'Book not found'}), 404
 
-            user = User.query.get(user_id)  # Assuming user_id is the primary key
+            user = User.query.get(user_id)
             if not user:
                 return jsonify({'error': 'User not found'}), 404
 
@@ -102,5 +103,137 @@ def manage_comments():
 
         except Exception as e:
             print(f"Error while adding comment: {e}")
+            db.session.rollback()
+            return jsonify({'error': 'Internal Server Error'}), 500
+
+# PUT and DELETE for Comments (Route: /api/comments/<comment_id>)
+@bookreview_api.route('/comments/<int:comment_id>', methods=['PUT', 'DELETE'])
+def update_delete_comment(comment_id):
+    comment = Comments.query.get(comment_id)
+
+    if not comment:
+        return jsonify({'error': 'Comment not found'}), 404
+
+    if request.method == 'PUT':
+        try:
+            data = request.get_json()
+            comment_text = data.get('comment_text')
+
+            if not comment_text:
+                return jsonify({'error': 'Comment text is required'}), 400
+
+            comment.comment_text = comment_text
+            db.session.commit()
+
+            return jsonify({
+                'id': comment.id,
+                'book_id': comment.book_id,
+                'user_id': comment.user_id,
+                'comment_text': comment.comment_text
+            })
+
+        except Exception as e:
+            print(f"Error while updating comment: {e}")
+            db.session.rollback()
+            return jsonify({'error': 'Internal Server Error'}), 500
+
+    elif request.method == 'DELETE':
+        try:
+            db.session.delete(comment)
+            db.session.commit()
+            return jsonify({'message': 'Comment deleted successfully'}), 200
+        except Exception as e:
+            print(f"Error while deleting comment: {e}")
+            db.session.rollback()
+            return jsonify({'error': 'Internal Server Error'}), 500
+
+
+# POST, PUT, DELETE for Book (Route: /api/books)
+@bookreview_api.route('/books', methods=['POST'])
+def create_book():
+    try:
+        data = request.get_json()
+
+        title = data.get('title')
+        author = data.get('author')
+        genre = data.get('genre')
+        description = data.get('description')
+        cover_url = data.get('cover_url')
+
+        if not title or not author:
+            return jsonify({'error': 'Title and author are required'}), 400
+
+        new_book = Book(
+            title=title,
+            author=author,
+            genre=genre,
+            description=description,
+            cover_url=cover_url
+        )
+
+        db.session.add(new_book)
+        db.session.commit()
+
+        return jsonify({
+            'id': new_book.id,
+            'title': new_book.title,
+            'author': new_book.author,
+            'genre': new_book.genre,
+            'description': new_book.description,
+            'cover_url': new_book.cover_url
+        }), 201
+
+    except Exception as e:
+        print(f"Error while creating book: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+
+# PUT and DELETE for Book (Route: /api/books/<book_id>)
+@bookreview_api.route('/books/<int:book_id>', methods=['PUT', 'DELETE'])
+def update_delete_book(book_id):
+    book = Book.query.get(book_id)
+
+    # Check if the book exists
+    if not book:
+        return jsonify({'error': 'Book not found'}), 404
+
+    if request.method == 'PUT':
+        try:
+            data = request.get_json()
+            book.title = data.get('title', book.title)
+            book.author = data.get('author', book.author)
+            book.genre = data.get('genre', book.genre)
+            book.description = data.get('description', book.description)
+            book.cover_url = data.get('cover_url', book.cover_url)
+            db.session.commit()
+
+            return jsonify({
+                'id': book.id,
+                'title': book.title,
+                'author': book.author,
+                'genre': book.genre,
+                'description': book.description,
+                'cover_url': book.cover_url
+            })
+
+        except Exception as e:
+            print(f"Error while updating book: {e}")
+            db.session.rollback()
+            return jsonify({'error': 'Internal Server Error'}), 500
+
+    elif request.method == 'DELETE':
+        try:
+            # Log the book ID to ensure correct value
+            print(f"Attempting to delete book with ID: {book_id}")
+
+            # Deleting the book
+            db.session.delete(book)
+            db.session.commit()
+
+            return jsonify({'message': 'Book deleted successfully'}), 200
+
+        except Exception as e:
+            print(f"Error while deleting book: {e}")
             db.session.rollback()
             return jsonify({'error': 'Internal Server Error'}), 500
