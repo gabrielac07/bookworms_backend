@@ -52,17 +52,20 @@ def get_emojis():
 @reaction_api.route('/<int:post_id>', methods=['GET'])
 def get_reactions(post_id):
     try:
-            reactions = Reaction.query.filter_by(post_id=post_id).all()
-            reactions_data = [
-                {
-                    'user_id': reaction.user_id,
-                    'reaction_type': reaction.reaction_type
-                }
-                for reaction in reactions
-            ]
-            return jsonify({
-                'post_id': post_id,
-                'reactions': reactions_data}), 200
+        # Query reactions for the specific post
+        reactions = Reaction.query.filter_by(post_id=post_id).all()
+
+        #Format the data to resturn
+        reactions_data = [
+            {
+                'user_id': reaction.user_id,
+                'reaction_type': reaction.reaction_type
+            }
+            for reaction in reactions
+        ]
+        return jsonify({
+            'post_id': post_id,
+            'reactions': reactions_data}), 200
     except Exception as e:
         return jsonify({'error': 'Failed to get reactions', 'message': str(e)}), 500
 
@@ -74,6 +77,7 @@ def update_reaction():
     post_id = data.get("post_id")
     new_reaction_type = data.get("reaction_type")
 
+    # validate input
     if not user_id or not post_id or not new_reaction_type:
         return jsonify({"error": "All fields (user_id, post_id, reaction_type) are required"}), 400
 
@@ -81,11 +85,14 @@ def update_reaction():
         return jsonify({"error": "Invalid emoji"}), 400
 
     try:
+        # Fetch the reaction from the database
         reaction = Reaction.query.filter_by(user_id=user_id, post_id=post_id).first()
 
+        # If the reaction does not exist, return an error
         if not reaction:
           return jsonify({"error": "Reaction not found"}), 404
        
+       # Update the reaction type
         reaction.reaction_type = new_reaction_type
 
         db.session.commit()
@@ -111,11 +118,13 @@ def delete_reaction():
     if not user_id or not post_id:
         return jsonify({"error": "Both user_id and post_id are required"}), 400
 
+    # Query the Reaction model to find the reaction by user_id and post_id
     reaction = Reaction.query.filter_by(user_id=user_id, post_id=post_id).first()
 
     if not reaction:
         return jsonify({"error": "Reaction not found"}), 404
     
+    # Delete the reaction from te database
     db.session.delete(reaction)
     db.session.commit()
 
@@ -124,16 +133,17 @@ def delete_reaction():
 # Delete - Reset all reactions for a specific post
 @reaction_api.route('/reset_reactions/<post_id>', methods=['DELETE']) #/1
 def reset_reactions(post_id):
-
+    #Query all reactions for the post
     reactions = Reaction.query.filter_by(post_id=post_id).all()
 
     if not reactions:
         return jsonify({"error": "No reactions found for this post"}), 404
    
+   # Dedlete all reactions for the post
     for reaction in reactions:
         db.session.delete(reaction)
 
-    db.session.commit()
+    db.session.commit() # Commit the deletetion
 
 if __name__ == '__main__':
     app.run(debug=True)
