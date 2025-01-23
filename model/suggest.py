@@ -60,23 +60,6 @@ class SuggestedBook(db.Model):
         db.session.add(self)
         db.session.commit()
         
-    def delete(self):
-        """
-        The delete method removes the object from the database and commits the transaction.
-        
-        Uses:
-            The db ORM methods to delete and commit the transaction.
-        
-        Raises:
-            Exception: An error occurred when deleting the object from the database.
-        """    
-        try:
-            db.session.delete(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            raise e
-        
     def read(self):
         """
         Retrieve the vote data as a dictionary.
@@ -92,6 +75,39 @@ class SuggestedBook(db.Model):
             "description": self.description,
             "cover_image_url": self.cover_image_url
         }
+        
+    def update(self):
+        """
+        The update method commits the transaction to the database.
+        
+        Uses:
+            The db ORM method to commit the transaction.
+        
+        Raises:
+            Exception: An error occurred when updating the object in the database.
+        """
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+    
+    def delete(self):
+        """
+        The delete method removes the object from the database and commits the transaction.
+        
+        Uses:
+            The db ORM methods to delete and commit the transaction.
+        
+        Raises:
+            Exception: An error occurred when deleting the object from the database.
+        """    
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+        raise Exception(f"An error occurred while deleting the object: {str(e)}") from e
     
     @staticmethod
     def restore(data):
@@ -148,18 +164,3 @@ def initSuggest():
             except IntegrityError:
                 # Fails with bad or duplicate data
                 db.session.rollback()
-
-"""            
-                    db.session.add(suggestion)
-                    db.session.commit()
-                    print(f"Record created: {repr(suggestion)}")
-                else:
-                    print(f"Book already exists: {suggestion.title}")
-            except IntegrityError:
-                # Rollback in case of error
-                db.session.rollback()
-                print(f"Error occurred while adding {suggestion.title}. Rolling back.")
-            except Exception as e:
-                db.session.rollback()
-                print(f"Unexpected error: {str(e)}")
-""" 
