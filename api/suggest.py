@@ -8,9 +8,11 @@ from __init__ import db
 suggest_api = Blueprint('suggest_api', __name__, url_prefix='/api/suggest')
 api = Api(suggest_api)
 
-# Endpoint to add suggested books
+# Endpoint to add suggested books (Create)
 @suggest_api.route('', methods=['POST'])  
 def add_book():
+    if not request.json or 'title' not in request.json:
+        return jsonify({'error': 'Title is required to delete the book'}), 400
     data = request.json
 
     title = data.get('title')
@@ -27,6 +29,7 @@ def add_book():
     except Exception as e:
         return jsonify({'error': 'Failed to add book', 'message': str(e)}), 500
 
+# Add multiple suggested books (Create)
 @suggest_api.route('/bulk', methods=['POST'])
 def add_books_bulk():
     data = request.json
@@ -53,7 +56,7 @@ def add_books_bulk():
 
     return jsonify(results), 201
 
-# Endpoint to fetch a random suggested book
+# Endpoint to fetch a random suggested book (Read)
 @suggest_api.route('/book', methods=['GET'])
 def get_suggestion():
     try:
@@ -76,7 +79,7 @@ def get_suggestion():
     except Exception as e:
         return jsonify({'error': 'Failed to fetch books', 'message': str(e)}), 500
 
-# Endpoint to fetch a random suggested book
+# Endpoint to fetch a random suggested book (Read)
 @suggest_api.route('/random', methods=['GET'])
 def random_book():
     book = SuggestedBook.get_random_suggested_book()
@@ -90,3 +93,49 @@ def random_book():
         })
     else:
         return jsonify({'error': 'No books found'}), 404
+    
+# Endpoint to update existing suggested book (Update)
+@suggest_api.route('', methods=['PUT'])
+def update_book():
+    data = request.json
+
+    title = data.get('title')
+    if not title:
+        return jsonify({'error': 'Title is required to update the book'}), 400
+
+    try:
+        # Fetch the existing book by title
+        suggested_book = SuggestedBook.query.filter_by(title=title).first()
+        if not suggested_book:
+            return jsonify({'error': 'Book not found'}), 404
+
+        # Update the book details
+        suggested_book.author = data.get('author', suggested_book.author)
+        suggested_book.genre = data.get('genre', suggested_book.genre)
+        suggested_book.description = data.get('description', suggested_book.description)
+        suggested_book.cover_image_url = data.get('cover_image_url', suggested_book.cover_image_url)
+
+        suggested_book.update()  # Assuming `update()` method commits the changes
+        return jsonify({'message': 'Book updated successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to update book', 'message': str(e)}), 500
+
+@suggest_api.route('', methods=['DELETE'])
+def delete_book():
+    data = request.json
+    
+    title = data.get('title')
+    if not title:
+        return jsonify({'error': 'Title is required to delete the book'}), 400
+
+    try:
+        suggested_book = SuggestedBook.query.filter_by(title=title).first()
+        
+        if not suggested_book:
+            return jsonify({'error': 'Book not found'}), 404
+        
+        suggested_book.delete()
+        
+        return jsonify({'message': 'Book deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to delete book', 'message': str(e)}), 500
