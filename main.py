@@ -211,6 +211,7 @@ def extract_data():
         data['suggestions'] = [suggestion.read() for suggestion in SuggestedBook.query.all()]
         data['cart_items'] = [cart_item.read() for cart_item in CartItem.query.all()]
         data['savedbookrecs'] = [savedbookrec.read() for savedbookrec in SaveBookRec.query.all()]
+        data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
     return data
 
 # Save extracted data to JSON files
