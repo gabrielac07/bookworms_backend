@@ -9,11 +9,11 @@ from model.user import User
 # Database model for the cart
 class CartItem(db.Model):
     __tablename__ = 'cart_items'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(String, db.ForeignKey(Book.title), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    username = db.Column(String, db.ForeignKey(User._name), nullable=False)
+    id = Column(db.Integer, primary_key=True)
+    title = Column(String, db.ForeignKey(Book.title), nullable=False)
+    price = Column(db.Float, nullable=False)
+    quantity = Column(db.Integer, nullable=False)
+    username = Column(String, db.ForeignKey(User._name), nullable=False)
 
     def create(self):
         try:
@@ -27,6 +27,7 @@ class CartItem(db.Model):
         return {
             'id': self.id,
             'title' : self.title,
+            'price': self.price,
             'quantity': self.quantity,
             'username': self.username
         }
@@ -34,46 +35,33 @@ class CartItem(db.Model):
 # Initialize cart items
 def init_books_in_cart():
     books_in_cart = [
-        {
-            "title": "1984",  
-            "price": 15.00,  
-            "quantity": 2,  
-            "username": "Avika"
-        },
-        {
-            "title": "Animal Farm",  
-            "price": 12.00,
-            "quantity": 1,
-            "username": "Soumini"
-        },
-        {
-            "title": "Bread Givers",  
-            "price": 10.00,
-            "quantity": 4,
-            "username": "Aarush"
-        }
+        {"id": 1, "title": "1984", "price": 15.00, "quantity": 2, "_name": "Avika"},
+        {"id": 2, "title": "The Hobbit", "price": 12.00, "quantity": 1, "_name": "Soumini"},
+        {"id": 3, "title": "The Outsiders", "price": 10.00, "quantity": 4, "_name": "Aarush"},
+        {"id": 4, "title": "A Game of Thrones", "price": 13.00, "quantity": 1, "_name": "Aditi"},
+        {"id": 5, "title": "The Nightingale", "price": 16.00, "quantity": 2, "_name": "Thomas Edison"}
     ]
 
     for book in books_in_cart:
         # Check for duplicate entries to avoid IntegrityError
-        existing_cart_item = CartItem.query.filter_by(title=book["title"], username=book["username"]).first()
+        existing_cart_item = CartItem.query.filter_by(title=book["title"], username=book["_name"]).first()
         if not existing_cart_item:
             new_cart_item = CartItem(
                 title=book["title"],
                 price=book["price"],
                 quantity=book["quantity"],
-                username=book["username"]
+                username=book["_name"]
             )
-            db.session.add(new_cart_item)
+            db.session.add(new_cart_item)  # Add valid CartItem instances
 
     try:
-        db.session.commit()  # Commit the changes
-    except IntegrityError:
-        db.session.rollback()  # Rollback if there is an integrity error
-        print("IntegrityError: Could be a duplicate entry or violation of database constraints.")
+        db.session.commit()  # Commit changes to the database
+    except IntegrityError as e:
+        db.session.rollback()
+        print(f"IntegrityError: {e}")
     except Exception as e:
-        db.session.rollback()  # Rollback for other errors
-        print(f"Error: {e}")
+        db.session.rollback()
+        print(f"Unexpected error: {e}")
 
 # Initialize the database
 with app.app_context():
