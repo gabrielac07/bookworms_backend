@@ -115,8 +115,7 @@ def initComments():
                 user_id=comment["user_id"]
             )
             db.session.add(new_comment)
-        else:
-            print(f"Skipping existing comment: {comment}")
+            
 
     try:
         db.session.commit()  # Commit the changes
