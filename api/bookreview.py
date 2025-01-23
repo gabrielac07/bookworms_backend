@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_restful import Api
 from model.librarydb import Book
 from model.commentsdb import Comments
+from model.user import User
 import random
 from __init__ import app, db
 
@@ -10,36 +11,44 @@ api = Api(bookreview_api)
 
 def get_random_book():
     try:
-        # Query all books
-        books_query = Book.query.all()  # Fetch all books from the database
+        books_query = Book.query.all()
         if books_query:
-            return random.choice(books_query)  # Pick a random book if books are available
+            return random.choice(books_query)
         else:
-            return None  # Returns none if no books are found
+            return None
     except Exception as e:
         print(f"Error while fetching random book: {e}")
         return None
 
+def get_comments_for_book(book_id=None):
+    if book_id:
+        comments_query = Comments.query.filter_by(book_id=book_id).all()
+    else:
+        comments_query = Comments.query.all()
+
+    return [{
+        "id": comment.id,
+        "book_id": comment.book_id,
+        "user_id": comment.user_id,
+        "comment_text": comment.comment_text
+    } for comment in comments_query]
+
 @bookreview_api.route('/random_book', methods=['GET'])
 def random_book():
+    # Handle GET request to fetch random book
     book = get_random_book()
     if book:
-        # Fetch the comments associated with the book
-        comments_query = Comments.query.filter_by(book_id=book.id).all()
-        comments = [{"id": comment.id, "username": comment.username, "comment_text": comment.comment_text} for comment in comments_query]
-
-        # If a random book is found, return its details along with comments
+        comments = get_comments_for_book(book_id=book.id)
         return jsonify({
             'id': book.id,
             'title': book.title,
             'author': book.author,
             'genre': book.genre,
             'description': book.description,
-            'image_cover': book.cover_image_url,
-            'comments': comments  # Include the list of comments
+            'cover_url': book.cover_url,
+            'comments': comments
         })
     else:
-        # If no book is found, return an error message 
         return jsonify({'error': 'No books found'}), 404
 
 @bookreview_api.route('/comments', methods=['GET', 'POST'])
@@ -47,60 +56,47 @@ def manage_comments():
     if request.method == 'GET':
         book_id = request.args.get('book_id')
 
-        if book_id:
-            # Query comments for the specific book
-            comments_query = Comments.query.filter_by(book_id=book_id).all()
-            comments = [{"id": comment.id, "username": comment.username, "comment_text": comment.comment_text} for comment in comments_query]
-            
-            if comments:
-                return jsonify({'comments': comments})
-            else:
-                return jsonify({'message': 'No comments found for this book'}), 404
+        if not book_id:
+            return jsonify({'error': 'Book ID is required'}), 400
+
+        comments = get_comments_for_book(book_id)
+        if comments:
+            return jsonify({'comments': comments})
         else:
-            # If no book_id is specified, get all comments
-            comments_query = Comments.query.all()
-            comments = [{"id": comment.id, "book_id": comment.book_id, "username": comment.username, "comment_text": comment.comment_text} for comment in comments_query]
-            
-            if comments:
-                return jsonify({'comments': comments})
-            else:
-                return jsonify({'message': 'No comments available'}), 404
+            return jsonify({'message': 'No comments found for this book'}), 404
 
     elif request.method == 'POST':
         try:
-            # Get the JSON data from the request body
             data = request.get_json()
 
-            # Extract data from the request
             book_id = data.get('book_id')
-            username = data.get('username')
+            user_id = data.get('user_id')
             comment_text = data.get('comment_text')
 
-            # Validate the data
-            if not book_id or not username or not comment_text:
-                return jsonify({'error': 'Missing required fields: book_id, username, or comment_text'}), 400
+            if not book_id or not user_id or not comment_text:
+                return jsonify({'error': 'Missing required fields: book_id, user_id, or comment_text'}), 400
 
-            # Check if the book exists
             book = Book.query.get(book_id)
             if not book:
                 return jsonify({'error': 'Book not found'}), 404
 
-            # Create the new comment
+            user = User.query.get(user_id)  # Assuming user_id is the primary key
+            if not user:
+                return jsonify({'error': 'User not found'}), 404
+
             new_comment = Comments(
                 book_id=book_id,
-                username=username,
+                user_id=user.id,
                 comment_text=comment_text
             )
 
-            # Add the comment to the session and commit
             db.session.add(new_comment)
             db.session.commit()
 
-            # Return a success response with the created comment details
             return jsonify({
                 'id': new_comment.id,
                 'book_id': new_comment.book_id,
-                'username': new_comment.username,
+                'user_id': new_comment.user_id,
                 'comment_text': new_comment.comment_text
             }), 201
 

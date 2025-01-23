@@ -185,6 +185,7 @@ def generate_data():
     initBooks()
     initReactions()
     initSavedBookRecs()
+    initComments()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -207,6 +208,7 @@ def extract_data():
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
         data['books'] = [book.read() for book in Book.query.all()]
+        data['comments'] = [comment.read() for comment in Comments.query.all()]
         data['reaction'] = [reaction.read() for reaction in Reaction.query.all()]
 
     return data
@@ -235,6 +237,7 @@ def restore_data(data):
         _ = Section.restore(data['sections'])
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
+        _ = Book.restore(data)
         _ = Comments.restore(data['comments'])
         _ = SaveBookRec.restore(data['savedbookrecs'])
     print("Data restored to the new database.")
