@@ -32,7 +32,7 @@ from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
 from api.bookpurchase import bookpurchase_api # Avika added this, book purchase for her website
-
+from api.librarydb import library_api
 from api.vote import vote_api
 
 
@@ -69,6 +69,7 @@ app.register_blueprint(bookrec_api)
 app.register_blueprint(car_chat_api)
 app.register_blueprint(bookreview_api)
 app.register_blueprint(suggest_api)
+app.register_blueprint(library_api)
 app.register_blueprint(reaction_api)
 app.register_blueprint(bookpurchase_api) # Avika added this, book purchase for her website
 # Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
@@ -213,6 +214,7 @@ def extract_data():
         data['posts'] = [post.read() for post in Post.query.all()]
         data['suggestions'] = [suggestion.read() for suggestion in SuggestedBook.query.all()]
         data['cart_items'] = [cart_item.read() for cart_item in CartItem.query.all()]
+        data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
         data['savedbookrecs'] = [savedbookrec.read() for savedbookrec in SaveBookRec.query.all()]
     return data
 
