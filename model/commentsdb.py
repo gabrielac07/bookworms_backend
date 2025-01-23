@@ -11,7 +11,7 @@ class Comments(db.Model):
     __tablename__ = 'comments'
     id = db.Column(Integer, primary_key=True)
     book_id = db.Column(Integer, db.ForeignKey('books.id'), nullable=False)  # Reference to Book.id
-    user_id = db.Column(Integer, db.ForeignKey('users.id'), nullable=False)  # Reference to User.id
+    username = db.Column(Integer, db.ForeignKey('users.id'), nullable=False)  # Reference to User.id
     comment_text = db.Column(Text, nullable=False)
 
     # Establish relationships
@@ -23,7 +23,7 @@ class Comments(db.Model):
         # Check if the comment already exists for this user and book
         existing_comment = Comments.query.filter_by(
             book_id=self.book_id,
-            user_id=self.user_id,
+            username=self.username,
             comment_text=self.comment_text
         ).first()
 
@@ -43,7 +43,7 @@ class Comments(db.Model):
         return {
             'id': self.id,
             'book_id': self.book_id,
-            'user_id': self.user_id,
+            'user_id': self.username,
             'comment_text': self.comment_text
         }
 
@@ -52,13 +52,13 @@ class Comments(db.Model):
             return self
 
         book_id = inputs.get("book_id", None)
-        user_id = inputs.get("user_id", None)
+        username = inputs.get("username", None)
         comment_text = inputs.get("comment_text", "")
 
         if book_id:
             self.book_id = book_id
-        if user_id:
-            self.user_id = user_id
+        if username:
+            self.username = username
         if comment_text:
             self.comment_text = comment_text
 
@@ -85,17 +85,17 @@ def initComments():
         {
             "book_id": 1,  # Reference to the book with ID 1 (ensure the book exists)
             "comment_text": "I loved this book!",
-            "user_id": 1,  # Reference to the user with ID 1 (ensure the user exists)
+            "username": 1,  # Reference to the user with ID 1 (ensure the user exists)
         },
         {
             "book_id": 2,
             "comment_text": "This was an amazing read! Highly recommend.",
-            "user_id": 1,
+            "username": 1,
         },
         {
             "book_id": 4,  # Reference to the book with ID 1
             "comment_text": "Really insightful. The chapters on his inventions were fantastic.",
-            "user_id": 1,  # Reference to the user with ID 1
+            "username": 1,  # Reference to the user with ID 1
         }
     ]
 
@@ -104,7 +104,7 @@ def initComments():
         # Check if the comment already exists before adding it to the session
         existing_comment = Comments.query.filter_by(
             book_id=comment["book_id"],
-            user_id=comment["user_id"],
+            username=comment["username"],
             comment_text=comment["comment_text"]
         ).first()
 
@@ -112,7 +112,7 @@ def initComments():
             new_comment = Comments(
                 book_id=comment["book_id"],
                 comment_text=comment["comment_text"],
-                user_id=comment["user_id"]
+                username=comment["username"]
             )
             db.session.add(new_comment)
         else:
