@@ -32,7 +32,6 @@ from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
 from api.bookpurchase import bookpurchase_api # Avika added this, book purchase for her website
-
 from api.vote import vote_api
 
 
@@ -213,6 +212,7 @@ def extract_data():
         data['posts'] = [post.read() for post in Post.query.all()]
         data['suggestions'] = [suggestion.read() for suggestion in SuggestedBook.query.all()]
         data['cart_items'] = [cart_item.read() for cart_item in CartItem.query.all()]
+        data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
         data['savedbookrecs'] = [savedbookrec.read() for savedbookrec in SaveBookRec.query.all()]
         data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
     return data

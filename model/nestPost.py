@@ -154,7 +154,6 @@ def initNestPosts():
         for post in [p1, p2, p3, p4]:
             try:
                 post.create()
-                print(f"Record created: {repr(post)}")
             except IntegrityError:
                 '''fails with bad or duplicate data'''
                 db.session.remove()
