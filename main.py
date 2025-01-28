@@ -57,7 +57,7 @@ from model.bookrecdb import SaveBookRec, initSavedBookRecs
 # register URIs for api endpoints
 app.register_blueprint(messages_api) # Adi added this, messages for his website
 app.register_blueprint(user_api)
-app.register_blueprint(wishlist_api)
+app.register_blueprint(wishlist_api)  # Ensure this line is present
 app.register_blueprint(pfp_api) 
 app.register_blueprint(post_api)
 app.register_blueprint(channel_api)
@@ -242,8 +242,7 @@ def restore_data(data):
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
         _ = SuggestedBook.restore(data['suggestions'])
-        _ = Wishlist.restore(data['wishlist'])  # Fixed
-        _ = CartItem.restore(data['cart_items'])
+        _ = Wishlist.restore(data['wishlist']) 
 
     print("Data restored to the new database.")
 

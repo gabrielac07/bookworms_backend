@@ -1,6 +1,5 @@
 from __init__ import db, app
 from model.librarydb import Book
-from model.user import User  # Assuming the User model is defined in model/user.py
 from sqlalchemy.exc import IntegrityError
 
 # Define the Wishlist model
@@ -9,20 +8,17 @@ class Wishlist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
-    _uid = db.Column(db.String(255), db.ForeignKey('users._uid'), nullable=False)  # Foreign key to users table using _uid
 
     book = db.relationship('Book', backref='wishlist', lazy=True)
-    user = db.relationship('User', backref='wishlist', lazy=True)  # Relationship to User model
 
     def __repr__(self):
-        return f"<Wishlist(id={self.id}, book_id={self.book_id}, _uid={self._uid})>"
+        return f"<Wishlist(id={self.id}, book_id={self.book_id})>"
 
     def read(self):
         """Return a dictionary representation of the Wishlist item."""
         return {
             "id": self.id,
             "book_id": self.book_id,
-            "_uid": self._uid,
         }
         
     @classmethod
@@ -52,13 +48,12 @@ class Wishlist(db.Model):
             db.session.commit()
         return added_items
 
-# Function to delete a book from a user's wishlist
-def delete_from_wishlist(_uid, book_id):
+# Function to delete a book from the wishlist
+def delete_from_wishlist(book_id):
     """
-    Delete a book from a user's wishlist by its book_id.
+    Delete a book from the wishlist by its book_id.
 
     Args:
-        _uid (str): The UID of the user.
         book_id (int): The ID of the book to be removed from the wishlist.
 
     Returns:
@@ -66,13 +61,13 @@ def delete_from_wishlist(_uid, book_id):
     """
     with app.app_context():
         try:
-            item = Wishlist.query.filter_by(_uid=_uid, book_id=book_id).first()
+            item = Wishlist.query.filter_by(book_id=book_id).first()
             if item:
                 db.session.delete(item)
                 db.session.commit()
-                return f"Book with id {book_id} removed from user {_uid}'s wishlist."
+                return f"Book with id {book_id} removed from the wishlist."
             else:
-                return f"Book with id {book_id} not found in user {_uid}'s wishlist."
+                return f"Book with id {book_id} not found in the wishlist."
         except Exception as e:
             db.session.rollback()
             return f"An error occurred: {str(e)}"
@@ -88,9 +83,9 @@ def initWishlist():
 
         # Add starter data for Wishlist (replace with actual values as needed)
         wishlist_items = [
-            Wishlist(book_id=1, _uid="toby"),
-            Wishlist(book_id=2, _uid="toby"),
-            Wishlist(book_id=3, _uid="toby"),
+            Wishlist(book_id=1),
+            Wishlist(book_id=2),
+            Wishlist(book_id=3),
         ]
         
         for item in wishlist_items:
@@ -102,27 +97,23 @@ def initWishlist():
                 db.session.rollback()
                 print(f"Duplicate or error: {repr(item)}")
 
-# Function to fetch a user's wishlist
-def get_wishlist_by_user(_uid):
+# Function to fetch the wishlist
+def get_wishlist():
     """
-    Get all wishlist items for a specific user.
-
-    Args:
-        _uid (str): The UID of the user.
+    Get all wishlist items.
 
     Returns:
-        list: A list of wishlist items for the user.
+        list: A list of wishlist items.
     """
     with app.app_context():
-        return Wishlist.query.filter_by(_uid=_uid).all()
+        return Wishlist.query.all()
 
-# Function to add a book to a user's wishlist
-def add_to_wishlist(_uid, book_id):
+# Function to add a book to the wishlist
+def add_to_wishlist(book_id):
     """
-    Add a book to a user's wishlist.
+    Add a book to the wishlist.
 
     Args:
-        _uid (str): The UID of the user.
         book_id (int): The ID of the book to add.
 
     Returns:
@@ -130,13 +121,13 @@ def add_to_wishlist(_uid, book_id):
     """
     with app.app_context():
         try:
-            item = Wishlist(book_id=book_id, _uid=_uid)
+            item = Wishlist(book_id=book_id)
             db.session.add(item)
             db.session.commit()
-            return f"Book with id {book_id} added to user {_uid}'s wishlist."
+            return f"Book with id {book_id} added to the wishlist."
         except IntegrityError:
             db.session.rollback()
-            return f"Book with id {book_id} already exists in user {_uid}'s wishlist."
+            return f"Book with id {book_id} already exists in the wishlist."
         except Exception as e:
             db.session.rollback()
             return f"An error occurred: {str(e)}"
