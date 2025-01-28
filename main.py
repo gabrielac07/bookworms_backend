@@ -57,7 +57,7 @@ from model.bookrecdb import SaveBookRec, initSavedBookRecs
 # register URIs for api endpoints
 app.register_blueprint(messages_api) # Adi added this, messages for his website
 app.register_blueprint(user_api)
-app.register_blueprint(wishlist_api)
+app.register_blueprint(wishlist_api)  # Ensure this line is present
 app.register_blueprint(pfp_api) 
 app.register_blueprint(post_api)
 app.register_blueprint(channel_api)
@@ -215,8 +215,6 @@ def extract_data():
         data['cart_items'] = [cart_item.read() for cart_item in CartItem.query.all()]
         data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
         data['savedbookrecs'] = [savedbookrec.read() for savedbookrec in SaveBookRec.query.all()]
-        data['books'] = [books.read() for books in Book.query.all()]
-        data['comments'] = [comments.read() for comments in Comments.query.all()]
         data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
     return data
 
@@ -246,9 +244,7 @@ def restore_data(data):
         _ = Channel.restore(data['channels'])
         _ = SuggestedBook.restore(data['suggestions'])
         _ = Wishlist.restore(data['wishlist'])  # Fixed
-        _ = Comments.restore(data['comments'])
-        
-        # _ = CartItem.restore(data['cart_items'])
+        _ = CartItem.restore(data['cart_items'])
 
     print("Data restored to the new database.")
 
