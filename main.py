@@ -245,6 +245,8 @@ def restore_data(data):
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
         _ = SuggestedBook.restore(data['suggestions'])
+        _ = Comments.restore(data['comments'])
+        _ = Book.restore(data['books'])
         _ = Wishlist.restore(data['wishlist'])  # Fixed
         _ = CartItem.restore(data['cart_items'])
 
