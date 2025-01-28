@@ -184,6 +184,7 @@ def generate_data():
     initNestPosts()
     initVotes()
     initBooks()
+    initComments()
     initReactions()
     initWishlist()
     initSavedBookRecs()
@@ -216,6 +217,7 @@ def extract_data():
         data['cart_items'] = [cart_item.read() for cart_item in CartItem.query.all()]
         data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
         data['savedbookrecs'] = [savedbookrec.read() for savedbookrec in SaveBookRec.query.all()]
+        data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
     return data
 
 # Save extracted data to JSON files
@@ -230,7 +232,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'wishlist', 'cart_items', 'suggestions', 'comments', 'books']:
+    for table in ['users', 'sections', 'groups', 'channels', 'wishlist', 'cart_items', 'suggestions', 'books', 'comments']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -243,10 +245,8 @@ def restore_data(data):
         _ = Group.restore(data['groups'], users)
         _ = Channel.restore(data['channels'])
         _ = SuggestedBook.restore(data['suggestions'])
-        _ = Wishlist.restore(data['wishlist']) 
-        _ = Comments.restore(data['comments'])
-        _ = Book.restore(data['books'])
-        # _ = CartItem.restore(data['cart_items', users])
+        _ = Wishlist.restore(data['wishlist'])  # Fixed
+        _ = CartItem.restore(data['cart_items'])
 
     print("Data restored to the new database.")
 

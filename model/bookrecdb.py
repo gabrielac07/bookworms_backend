@@ -11,14 +11,14 @@ class SaveBookRec(db.Model): # Class to save a book recommendation
     author = db.Column(String, nullable=False)
     genre = db.Column(String)
     description = db.Column(Text)
-    cover_image_url = db.Column(String)
+    cover_url = db.Column(String)
 
-    def __init__(self, title, author, genre, description, cover_image_url): # Constructor to initialize the book recommendation
+    def __init__(self, title, author, genre, description, cover_url): # Constructor to initialize the book recommendation
         self.title = title
         self.author = author
         self.genre = genre
         self.description = description
-        self.cover_image_url = cover_image_url
+        self.cover_url = cover_url
 
     def read(self): # Function to read the book recommendation
         return {
@@ -27,7 +27,7 @@ class SaveBookRec(db.Model): # Class to save a book recommendation
             'author': self.author,
             'genre': self.genre,
             'description': self.description,
-            'cover_image_url': self.cover_image_url
+            'cover_url': self.cover_url
         }
     
     @classmethod # Class method to restore the book recommendation
@@ -37,14 +37,14 @@ class SaveBookRec(db.Model): # Class to save a book recommendation
             if existing_record:
                 existing_record.genre = item['genre']
                 existing_record.description = item['description']
-                existing_record.cover_image_url = item['cover_image_url']
+                existing_record.cover_url = item['cover_url']
             else: # If the book recommendation does not exist, create a new record
                 new_record = cls( # Create a new record
                     title=item['title'],
                     author=item['author'],
                     genre=item['genre'],
                     description=item['description'],
-                    cover_image_url=item['cover_image_url']
+                    cover_url=item['cover_url']
                 )
                 db.session.add(new_record)
         db.session.commit()
@@ -66,14 +66,14 @@ def initSavedBookRecs(): # Function to initialize the saved book recommendations
                 author=book[1],
                 genre=book[2],
                 description=book[3],
-                cover_image_url=book[4]
+                cover_url=book[4]
             )
             db.session.add(save_newbookrec)  # Add the book to session
     '''
-    for title, author, genre, description, cover_image_url in saved_bookrecs_data: # Iterate through the saved book recommendations
+    for title, author, genre, description, cover_url in saved_bookrecs_data: # Iterate through the saved book recommendations
         # Check if the book already exists in the database
         if not SaveBookRec.query.filter_by(title=title, author=author).first():
-            new_book = SaveBookRec(title=title, author=author, genre=genre, description=description, cover_image_url=cover_image_url)
+            new_book = SaveBookRec(title=title, author=author, genre=genre, description=description, cover_url=cover_url)
             db.session.add(new_book)
 
     try: # Try to add the new book to the database

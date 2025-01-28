@@ -31,10 +31,10 @@ def random_bookrec():
         book = get_random_bookrec(genre)
         if book:
             return jsonify({
-            'title': book.title,
-            'author': book.author,
-            'description': book.description,
-            'image_cover': book.cover_image_url
+                'title': book.title,
+                'author': book.author,
+                'description': book.description,
+                'image_cover': book.cover_url
             })
         else: # Retry if no books are found in the database for the requested genre
             return jsonify({"error": "No books found, retrying in 5 seconds..."}), 404
@@ -49,7 +49,7 @@ def add_book():
     author = data.get('author')
     genre = data.get('genre')
     description = data.get('description')
-    cover_url = data.get('cover_url')
+    cover_url = data.get('cover_url') 
 
     if not title or not author:
         return jsonify({"error": "Title and author are required"}), 400
