@@ -11,22 +11,22 @@ class SuggestedBook(db.Model):
     author = db.Column(db.String, nullable=False)
     genre = db.Column(db.String, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    cover_image_url = db.Column(db.String, nullable=True)
+    cover_url = db.Column(db.String, nullable=True)
 
-    def __init__(self, title, author, genre, description, cover_image_url):
+    def __init__(self, title, author, genre, description, cover_url):
         self.title = title
         self.author = author
         self.genre = genre
         self.description = description
-        self.cover_image_url = cover_image_url
+        self.cover_url = cover_url
 
-    def add_suggested_book(title, author, genre, description, cover_image_url):
+    def add_suggested_book(title, author, genre, description, cover_url):
         new_suggested_book = SuggestedBook(
             title=title,
             author=author,
             genre=genre,
             description=description,
-            cover_image_url=cover_image_url
+            cover_url=cover_url
         )
 
         new_book = Book(
@@ -34,7 +34,7 @@ class SuggestedBook(db.Model):
             author=author,
             genre=genre,
             description=description,
-            cover_image_url=cover_image_url
+            cover_url=cover_url
         )
 
         try:
@@ -73,7 +73,7 @@ class SuggestedBook(db.Model):
             "author": self.author,
             "genre": self.genre,
             "description": self.description,
-            "cover_image_url": self.cover_image_url
+            "cover_url": self.cover_url
         }
         
     def update(self):
@@ -135,7 +135,7 @@ class SuggestedBook(db.Model):
                 existing_book.author = book_data.get('author', existing_book.author)
                 existing_book.genre = book_data.get('genre', existing_book.genre)
                 existing_book.description = book_data.get('description', existing_book.description)
-                existing_book.cover_image_url = book_data.get('cover_image_url', existing_book.cover_image_url)
+                existing_book.cover_url = book_data.get('cover_url', existing_book.cover_url)
                 db.session.commit()
                 restored_books[existing_book.id] = existing_book
             else:
@@ -152,8 +152,8 @@ def initSuggest():
         
     # tester data
     suggest_data = [
-        SuggestedBook(title="The Raven Boys", author="Maggie Stiefvater", genre="Fantasy", description="A young adult fantasy novel about a girl from a family of clairvoyants, the boys she befriends, and how their lives are intertwined along their journey to wake a slumbering king.", cover_image_url="https://m.media-amazon.com/images/I/71s5v4HfFjL._AC_UF1000,1000_QL80_.jpg"),
-        SuggestedBook(title="Catch-22", author="Joseph Heller", genre="Classics", description="The work centres on Captain John Yossarian, an American bombardier stationed on a Mediterranean island during World War II, and chronicles his desperate attempts to stay alive.", cover_image_url="https://d28hgpri8am2if.cloudfront.net/book_images/cvr9781451621174_9781451621174_hr.jpg")
+        SuggestedBook(title="The Raven Boys", author="Maggie Stiefvater", genre="Fantasy", description="A young adult fantasy novel about a girl from a family of clairvoyants, the boys she befriends, and how their lives are intertwined along their journey to wake a slumbering king.", cover_url="https://m.media-amazon.com/images/I/71s5v4HfFjL._AC_UF1000,1000_QL80_.jpg"),
+        SuggestedBook(title="Catch-22", author="Joseph Heller", genre="Classics", description="The work centres on Captain John Yossarian, an American bombardier stationed on a Mediterranean island during World War II, and chronicles his desperate attempts to stay alive.", cover_url="https://d28hgpri8am2if.cloudfront.net/book_images/cvr9781451621174_9781451621174_hr.jpg")
     ]
 
     for suggestion in suggest_data:

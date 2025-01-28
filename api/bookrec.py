@@ -34,7 +34,7 @@ def random_bookrec():
                 'title': book.title,
                 'author': book.author,
                 'description': book.description,
-                'image_cover': book.cover_image_url
+                'image_cover': book.cover_url
             })
         else: # Retry if no books are found in the database for the requested genre
             return jsonify({"error": "No books found, retrying in 5 seconds..."}), 404
@@ -49,7 +49,7 @@ def add_book():
     author = data.get('author')
     genre = data.get('genre')
     description = data.get('description')
-    cover_image_url = data.get('cover_image_url') 
+    cover_url = data.get('cover_url') 
 
     if not title or not author:
         return jsonify({"error": "Title and author are required"}), 400
@@ -59,7 +59,7 @@ def add_book():
         author=author,
         genre=genre,
         description=description,
-        cover_image_url=cover_image_url
+        cover_url=cover_url
     )
 
     db.session.add(new_book) # Add the new book to the savebookrec table
@@ -96,7 +96,7 @@ def update_book(id):
     book.author = data.get('author', book.author)
     book.genre = data.get('genre', book.genre)
     book.description = data.get('description', book.description)
-    book.cover_image_url = data.get('cover_image_url', book.cover_image_url)
+    book.cover_url = data.get('cover_url', book.cover_url)
 
     db.session.commit() # Commit the changes to the database
     
