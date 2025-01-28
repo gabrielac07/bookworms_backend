@@ -131,7 +131,7 @@ def delete_reaction():
     return jsonify({"message": "Reaction deleted successfully"}), 200
 
 # Delete - Reset all reactions for a specific post
-@reaction_api.route('/reset_reactions/<post_id>', methods=['DELETE']) #/1
+@reaction_api.route('/reset_reactions/<int:post_id>', methods=['DELETE']) #/1
 def reset_reactions(post_id):
     #Query all reactions for the post
     reactions = Reaction.query.filter_by(post_id=post_id).all()

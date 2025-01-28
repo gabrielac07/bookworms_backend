@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash
 import shutil
 
 
+
 # import "objects" from "this" project
 from __init__ import app, db, login_manager  # Key Flask objects 
 # API endpoints
@@ -27,15 +28,16 @@ from api.nestPost import nestPost_api # Justin added this, custom format for his
 from api.messages_api import messages_api # Adi added this, messages for his website
 from api.carphoto import car_api
 from api.carChat import car_chat_api
-from api.bookreview import bookreview_api
+#from api.bookreview import bookreview_api
 from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
 from api.bookpurchase import bookpurchase_api # Avika added this, book purchase for her website
+from api.emotion import emotion_api
+
+
+
 from api.vote import vote_api
-
-
-
 # database Initialization functions
 from model.carChat import CarChat
 from model.user import User, initUsers
@@ -47,11 +49,13 @@ from model.nestPost import NestPost, initNestPosts # Justin added this, custom f
 from model.vote import Vote, initVotes
 from model.librarydb import Book, initBooks 
 from model.reaction import Reaction, initReactions
-from model.commentsdb import Comments, initComments
+#from model.commentsdb import Comments, initComments
 from model.suggest import SuggestedBook, initSuggest
 from model.bookpurchasedb import CartItem, init_books_in_cart
 from model.wishlist import Wishlist, initWishlist
 from model.bookrecdb import SaveBookRec, initSavedBookRecs
+from model.emotion import Emotion, initEmotion
+
 # server only Views
 
 # register URIs for api endpoints
@@ -66,7 +70,7 @@ app.register_blueprint(section_api)
 app.register_blueprint(student_api)
 app.register_blueprint(bookrec_api)
 app.register_blueprint(car_chat_api)
-app.register_blueprint(bookreview_api)
+#app.register_blueprint(bookreview_api)
 app.register_blueprint(suggest_api)
 app.register_blueprint(reaction_api)
 app.register_blueprint(bookpurchase_api) # Avika added this, book purchase for her website
@@ -75,6 +79,7 @@ app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
+app.register_blueprint(emotion_api)
 
 
 # Tell Flask-Login the view function name of your login route
@@ -189,6 +194,7 @@ def generate_data():
     initSavedBookRecs()
     init_books_in_cart()
     initSuggest()
+    initEmotion()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -215,6 +221,9 @@ def extract_data():
         data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
         data['savedbookrecs'] = [savedbookrec.read() for savedbookrec in SaveBookRec.query.all()]
         data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
+        data['reaction'] = [reaction.read() for reaction in Reaction.query.all()]
+        data['emotion'] = [emotion.read() for emotion in Emotion.query.all()]
+
     return data
 
 # Save extracted data to JSON files
@@ -229,7 +238,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'wishlist', 'cart_items', 'suggestions']:
+    for table in ['users', 'sections', 'groups', 'channels', 'posts', 'wishlist', 'cart_items', 'suggestions', 'reaction', 'emotion']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -243,7 +252,7 @@ def restore_data(data):
         _ = Channel.restore(data['channels'])
         _ = SuggestedBook.restore(data['suggestions'])
         _ = Wishlist.restore(data['wishlist']) 
-
+        _ = Emotion.restore(data['emotion'])
     print("Data restored to the new database.")
 
 # Define a command to backup data
