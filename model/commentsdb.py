@@ -126,7 +126,7 @@ class Comments(db.Model):
                     restored_comments[new_comment.id] = {
                         'status': 'error',
                         'message': str(e)
-                    }  # <-- Fixed the missing closing parenthesis here
+                    }  
 
         return restored_comments
 
