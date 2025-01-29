@@ -266,3 +266,8 @@ app.cli.add_command(custom_cli)
 if __name__ == "__main__":
     # change name for testing
     app.run(debug=True, host="0.0.0.0", port="8887")
+    
+    # first number - 8
+    # second number - 5
+    # third + 4th - # of table
+    # 8504
