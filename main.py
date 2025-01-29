@@ -28,7 +28,7 @@ from api.nestPost import nestPost_api # Justin added this, custom format for his
 from api.messages_api import messages_api # Adi added this, messages for his website
 from api.carphoto import car_api
 from api.carChat import car_chat_api
-#from api.bookreview import bookreview_api
+from api.bookreview import bookreview_api
 from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
@@ -49,7 +49,7 @@ from model.nestPost import NestPost, initNestPosts # Justin added this, custom f
 from model.vote import Vote, initVotes
 from model.librarydb import Book, initBooks 
 from model.reaction import Reaction, initReactions
-#from model.commentsdb import Comments, initComments
+from model.commentsdb import Comments, initComments
 from model.suggest import SuggestedBook, initSuggest
 from model.bookpurchasedb import CartItem, init_books_in_cart
 from model.wishlist import Wishlist, initWishlist
@@ -70,7 +70,7 @@ app.register_blueprint(section_api)
 app.register_blueprint(student_api)
 app.register_blueprint(bookrec_api)
 app.register_blueprint(car_chat_api)
-#app.register_blueprint(bookreview_api)
+app.register_blueprint(bookreview_api)
 app.register_blueprint(suggest_api)
 app.register_blueprint(reaction_api)
 app.register_blueprint(bookpurchase_api) # Avika added this, book purchase for her website
@@ -241,7 +241,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'wishlist', 'cart_items', 'suggestions']:
+    for table in ['users', 'sections', 'groups', 'channels', 'wishlist', 'cart_items', 'suggestions', 'books', 'comments']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -255,6 +255,8 @@ def restore_data(data):
         _ = Channel.restore(data['channels'])
         _ = SuggestedBook.restore(data['suggestions'])
         _ = Wishlist.restore(data['wishlist']) 
+        _ = Book.restore(data['books'])
+        _ = Comments.restore(data['comments'])
 
     print("Data restored to the new database.")
 
