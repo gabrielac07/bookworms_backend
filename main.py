@@ -11,6 +11,7 @@ from werkzeug.security import generate_password_hash
 import shutil
 
 
+
 # import "objects" from "this" project
 from __init__ import app, db, login_manager  # Key Flask objects 
 # API endpoints
@@ -32,10 +33,11 @@ from api.reaction import reaction_api
 from api.wishlist import wishlist_api  # Import the wishlist blueprint
 from api.suggest import suggest_api
 from api.bookpurchase import bookpurchase_api # Avika added this, book purchase for her website
+from api.emotion import emotion_api
+
+
+
 from api.vote import vote_api
-
-
-
 # database Initialization functions
 from model.carChat import CarChat
 from model.user import User, initUsers
@@ -52,6 +54,8 @@ from model.suggest import SuggestedBook, initSuggest
 from model.bookpurchasedb import CartItem, init_books_in_cart
 from model.wishlist import Wishlist, initWishlist
 from model.bookrecdb import SaveBookRec, initSavedBookRecs
+from model.emotion import Emotion, initEmotion
+
 # server only Views
 
 # register URIs for api endpoints
@@ -75,6 +79,7 @@ app.register_blueprint(nestPost_api)
 app.register_blueprint(nestImg_api)
 app.register_blueprint(vote_api)
 app.register_blueprint(car_api)
+app.register_blueprint(emotion_api)
 
 
 # Tell Flask-Login the view function name of your login route
@@ -184,11 +189,13 @@ def generate_data():
     initNestPosts()
     initVotes()
     initBooks()
+    initComments()
     initReactions()
     initWishlist()
     initSavedBookRecs()
     init_books_in_cart()
     initSuggest()
+    initEmotion()
     
 # Backup the old database
 def backup_database(db_uri, backup_uri):
@@ -210,11 +217,16 @@ def extract_data():
         data['groups'] = [group.read() for group in Group.query.all()]
         data['channels'] = [channel.read() for channel in Channel.query.all()]
         data['posts'] = [post.read() for post in Post.query.all()]
+        data['books'] = [book.read() for book in Book.query.all()]
+        data['comments'] = [comment.read() for comment in Comments.query.all()]
         data['suggestions'] = [suggestion.read() for suggestion in SuggestedBook.query.all()]
         data['cart_items'] = [cart_item.read() for cart_item in CartItem.query.all()]
         data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
         data['savedbookrecs'] = [savedbookrec.read() for savedbookrec in SaveBookRec.query.all()]
         data['wishlist'] = [wishlist_item.read() for wishlist_item in Wishlist.query.all()]
+        data['reaction'] = [reaction.read() for reaction in Reaction.query.all()]
+        data['emotion'] = [emotion.read() for emotion in Emotion.query.all()]
+
     return data
 
 # Save extracted data to JSON files
@@ -229,7 +241,7 @@ def save_data_to_json(data, directory='backup'):
 # Load data from JSON files
 def load_data_from_json(directory='backup'):
     data = {}
-    for table in ['users', 'sections', 'groups', 'channels', 'wishlist', 'cart_items', 'suggestions']:
+    for table in ['users', 'sections', 'groups', 'channels', 'wishlist', 'cart_items', 'suggestions', 'books', 'comments']:
         with open(os.path.join(directory, f'{table}.json'), 'r') as f:
             data[table] = json.load(f)
     return data
@@ -243,6 +255,9 @@ def restore_data(data):
         _ = Channel.restore(data['channels'])
         _ = SuggestedBook.restore(data['suggestions'])
         _ = Wishlist.restore(data['wishlist']) 
+        _ = Book.restore(data['books'])
+        _ = Comments.restore(data['comments'])
+        _ = CartItem.restore(data['cart_items'])
 
     print("Data restored to the new database.")
 

@@ -19,11 +19,11 @@ def add_book():
     author = data.get('author')
     genre = data.get('genre')
     description = data.get('description')
-    cover_image_url = data.get('cover_image_url')
+    cover_url = data.get('cover_url')
 
     try:
         # Create and add the suggested book
-        suggested_book = SuggestedBook(title=title, author=author, genre=genre, description=description, cover_image_url=cover_image_url)
+        suggested_book = SuggestedBook(title=title, author=author, genre=genre, description=description, cover_url=cover_url)
         suggested_book.create()
         return jsonify({'message': 'Book added successfully to suggestions'}), 201
     except Exception as e:
@@ -44,11 +44,11 @@ def add_books_bulk():
         author = book_data.get('author')
         genre = book_data.get('genre')
         description = book_data.get('description')
-        cover_image_url = book_data.get('cover_image_url')
+        cover_url = book_data.get('cover_url')
 
         try:
             # Create and add the suggested book
-            suggested_book = SuggestedBook(title=title, author=author, genre=genre, description=description, cover_image_url=cover_image_url)
+            suggested_book = SuggestedBook(title=title, author=author, genre=genre, description=description, cover_url=cover_url)
             suggested_book.create()
             results.append({'message': f'Book {title} added successfully to suggestions', 'title': title})
         except Exception as e:
@@ -70,7 +70,7 @@ def get_suggestion():
                 'author': book.author,
                 'genre': book.genre,
                 'description': book.description,
-                'cover_image_url': book.cover_image_url
+                'cover_url': book.cover_url
             }
             for book in books
         ]
@@ -89,7 +89,7 @@ def random_book():
             'author': book.author,
             'genre': book.genre,
             'description': book.description,
-            'image_cover': book.cover_image_url
+            'cover_url': book.cover_url
         })
     else:
         return jsonify({'error': 'No books found'}), 404
@@ -113,13 +113,14 @@ def update_book():
         suggested_book.author = data.get('author', suggested_book.author)
         suggested_book.genre = data.get('genre', suggested_book.genre)
         suggested_book.description = data.get('description', suggested_book.description)
-        suggested_book.cover_image_url = data.get('cover_image_url', suggested_book.cover_image_url)
+        suggested_book.cover_url = data.get('cover_url', suggested_book.cover_url)
 
         suggested_book.update()  # Assuming `update()` method commits the changes
         return jsonify({'message': 'Book updated successfully'}), 200
     except Exception as e:
         return jsonify({'error': 'Failed to update book', 'message': str(e)}), 500
 
+# Endpoint to delete  suggested book (Delete)
 @suggest_api.route('', methods=['DELETE'])
 def delete_book():
     data = request.json
@@ -134,7 +135,8 @@ def delete_book():
         if not suggested_book:
             return jsonify({'error': 'Book not found'}), 404
         
-        suggested_book.delete()
+        db.session.delete(suggested_book)
+        db.session.commit()
         
         return jsonify({'message': 'Book deleted successfully'}), 200
     except Exception as e:
