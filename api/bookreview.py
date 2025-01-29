@@ -9,6 +9,7 @@ from __init__ import app, db
 bookreview_api = Blueprint('bookreview_api', __name__, url_prefix='/api')
 api = Api(bookreview_api)
 
+# Fetch Random Book
 def get_random_book():
     try:
         books_query = Book.query.all()
@@ -20,6 +21,7 @@ def get_random_book():
         print(f"Error while fetching random book: {e}")
         return None
 
+# Fetch Comments for a Book
 def get_comments_for_book(book_id=None):
     if book_id:
         comments_query = Comments.query.filter_by(book_id=book_id).all()
@@ -33,7 +35,7 @@ def get_comments_for_book(book_id=None):
         "comment_text": comment.comment_text
     } for comment in comments_query]
 
-# Existing GET Random Book Route
+# Route to fetch a random book
 @bookreview_api.route('/random_book', methods=['GET'])
 def random_book():
     book = get_random_book()
@@ -50,6 +52,24 @@ def random_book():
         })
     else:
         return jsonify({'error': 'No books found'}), 404
+
+# Route to fetch a book by ID (this should handle /bookrates/{book_id} style URLs)
+@bookreview_api.route('/books/<int:book_id>', methods=['GET'])
+def get_book_by_id(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return jsonify({'error': 'Book not found'}), 404
+
+    comments = get_comments_for_book(book_id=book.id)
+    return jsonify({
+        'id': book.id,
+        'title': book.title,
+        'author': book.author,
+        'genre': book.genre,
+        'description': book.description,
+        'cover_url': book.cover_url,
+        'comments': comments
+    })
 
 # Comments Route (GET, POST, PUT, DELETE)
 @bookreview_api.route('/comments', methods=['GET', 'POST'])
