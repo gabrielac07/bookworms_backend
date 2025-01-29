@@ -257,6 +257,7 @@ def restore_data(data):
         _ = Wishlist.restore(data['wishlist']) 
         _ = Book.restore(data['books'])
         _ = Comments.restore(data['comments'])
+        _ = CartItem.restore(data['cart_items'])
 
     print("Data restored to the new database.")
 
