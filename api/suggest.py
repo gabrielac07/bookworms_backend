@@ -12,7 +12,7 @@ api = Api(suggest_api)
 @suggest_api.route('', methods=['POST'])  
 def add_book():
     if not request.json or 'title' not in request.json:
-        return jsonify({'error': 'Title is required to delete the book'}), 400
+        return jsonify({'error': 'Title is required to create the book'}), 400
     data = request.json
 
     title = data.get('title')
@@ -110,12 +110,13 @@ def update_book():
             return jsonify({'error': 'Book not found'}), 404
 
         # Update the book details
+        suggested_book.title = data.get('title', suggested_book.title)
         suggested_book.author = data.get('author', suggested_book.author)
         suggested_book.genre = data.get('genre', suggested_book.genre)
         suggested_book.description = data.get('description', suggested_book.description)
         suggested_book.cover_url = data.get('cover_url', suggested_book.cover_url)
 
-        suggested_book.update()  # Assuming `update()` method commits the changes
+        suggested_book.update() 
         return jsonify({'message': 'Book updated successfully'}), 200
     except Exception as e:
         return jsonify({'error': 'Failed to update book', 'message': str(e)}), 500
