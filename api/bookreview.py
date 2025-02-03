@@ -168,7 +168,7 @@ def update_delete_comment(comment_id):
             return jsonify({'error': 'Internal Server Error'}), 500
 
 
-# POST, PUT, DELETE for Book (Route: /api/books)
+# POST, PUT, DELETE for Book 
 @bookreview_api.route('/books', methods=['POST'])
 def create_book():
     try:
@@ -209,7 +209,7 @@ def create_book():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-# PUT and DELETE for Book (Route: /api/books/<book_id>)
+# PUT and DELETE for 
 @bookreview_api.route('/books/<int:book_id>', methods=['PUT', 'DELETE'])
 def update_delete_book(book_id):
     book = Book.query.get(book_id)
@@ -244,10 +244,8 @@ def update_delete_book(book_id):
 
     elif request.method == 'DELETE':
         try:
-            # Log the book ID to ensure correct value
             print(f"Attempting to delete book with ID: {book_id}")
-
-            # Deleting the book
+            
             db.session.delete(book)
             db.session.commit()
 
