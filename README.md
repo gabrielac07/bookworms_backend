@@ -83,7 +83,7 @@ pip install -r requirements.txt
     - Start with Play button
       - Play button sub option contains Debug
     - Click on loop back address in terminal to launch
-      - Output window will contain page to launch http://127.0.0.1:8087
+      - Output window will contain page to launch http://127.0.0.1:8504
     - Login using your secrets
 
 ## Idea
