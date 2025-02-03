@@ -65,7 +65,7 @@ def add_book():
     db.session.add(new_book) # Add the new book to the savebookrec table
     db.session.commit() # Commit the changes to the database
     
-    return jsonify({"message": "Book added successfully"}), 201
+    return jsonify({"message": "Book added successfully", 'success': True, 'id': new_book.id}), 201
 
 # Read a single book recommendation by ID
 @bookrec_api.route("/get_bookrec/<int:id>", methods=['GET']) # after the get_bookrec/ enter the id number (USE 1 or 2) of the book you want to get
