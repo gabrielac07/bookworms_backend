@@ -48,7 +48,6 @@ class CartItem(db.Model):
 
         try:
             db.session.commit()
-            print("Cart items restored successfully.")
         except IntegrityError as e:
             db.session.rollback()
             print(f"IntegrityError: {e}")
