@@ -131,3 +131,28 @@ def add_to_wishlist(book_id):
         except Exception as e:
             db.session.rollback()
             return f"An error occurred: {str(e)}"
+
+# Function to update a wishlist item
+def update_wishlist_item(item_id, new_book_id):
+    """
+    Update a wishlist item by its ID.
+
+    Args:
+        item_id (int): The ID of the wishlist item to update.
+        new_book_id (int): The new book ID to set.
+
+    Returns:
+        str: A success or error message.
+    """
+    with app.app_context():
+        try:
+            item = Wishlist.query.get(item_id)
+            if item:
+                item.book_id = new_book_id
+                db.session.commit()
+                return f"Wishlist item with id {item_id} updated to book_id {new_book_id}."
+            else:
+                return f"Wishlist item with id {item_id} not found."
+        except Exception as e:
+            db.session.rollback()
+            return f"An error occurred: {str(e)}"
