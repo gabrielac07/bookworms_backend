@@ -21,6 +21,16 @@ def get_random_book():
         print(f"Error while fetching random book: {e}")
         return None
 
+@app.route('/api/user/<user_id>', methods=['GET'])
+def get_user(user_id):
+    user = User.query.get(user_id)
+    if user:
+        return jsonify({
+            'name': user._name  # Only return the user's name
+        })
+    else:
+        return jsonify({'error': 'User not found'}), 404
+    
 # Fetch Comments for a Book
 def get_comments_for_book(book_id=None):
     if book_id:
@@ -28,12 +38,20 @@ def get_comments_for_book(book_id=None):
     else:
         comments_query = Comments.query.all()
 
-    return [{
-        "id": comment.id,
-        "book_id": comment.book_id,
-        "user_id": comment.user_id,
-        "comment_text": comment.comment_text
-    } for comment in comments_query]
+    comments_data = []
+    for comment in comments_query:
+        user = User.query.get(comment.user_id)  # Fetch the user using the user_id
+        user_name = user._name if user else "Unknown User"  # Fetch the name
+
+        comments_data.append({
+            "id": comment.id,
+            "book_id": comment.book_id,
+            "user_id": comment.user_id,  # Keep user_id
+            "user_name": user_name,  # Add the user_name
+            "comment_text": comment.comment_text
+        })
+
+    return comments_data
 
 # Route to fetch a random book
 @bookreview_api.route('/random_book', methods=['GET'])
@@ -209,7 +227,7 @@ def create_book():
         return jsonify({'error': 'Internal Server Error'}), 500
 
 
-# PUT and DELETE for 
+# PUT and DELETE for books
 @bookreview_api.route('/books/<int:book_id>', methods=['PUT', 'DELETE'])
 def update_delete_book(book_id):
     book = Book.query.get(book_id)
