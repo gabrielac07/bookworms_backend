@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from __init__ import app, db  # Import db object from your Flask app's __init__.py
 from model.librarydb import Book
-from model.wishlist import Wishlist  # Import the Wishlist model
+from model.wishlist import Wishlist, update_wishlist_item  # Import the update function
 
 # Create a Blueprint for the wishlist functionality
 wishlist_api = Blueprint('wishlist_api', __name__, url_prefix='/api/wishlist')
@@ -73,3 +73,29 @@ def delete_book_from_wishlist(book_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+# Route to update a wishlist item
+@wishlist_api.route('/<int:item_id>', methods=['PUT'])
+def update_wishlist_item_route(item_id):
+    """Update a wishlist item."""
+    if request.is_json:
+        data = request.get_json()
+        new_book_id = data.get('book_id')
+
+        # Validate that new_book_id is provided
+        if not new_book_id:
+            return jsonify({"error": "Missing book_id"}), 400
+
+        # Check if the new book exists in the books database
+        book = Book.query.get(new_book_id)
+        if not book:
+            return jsonify({"error": "Book not found"}), 404
+
+        # Update the wishlist item
+        result = update_wishlist_item(item_id, new_book_id)
+        if "updated" in result:
+            return jsonify({"message": result}), 200
+        else:
+            return jsonify({"error": result}), 404
+
+    return jsonify({"error": "Request must be JSON"}), 415
