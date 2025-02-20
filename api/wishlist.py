@@ -1,10 +1,17 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from __init__ import app, db  # Import db object from your Flask app's __init__.py
 from model.librarydb import Book
 from model.wishlist import Wishlist, update_wishlist_item  # Import the update function
+from api.jwt_authorize import token_required
+from model.user import User
+import logging
 
 # Create a Blueprint for the wishlist functionality
 wishlist_api = Blueprint('wishlist_api', __name__, url_prefix='/api/wishlist')
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Route to get a dropdown list of books
 @wishlist_api.route('/books', methods=['GET'])
@@ -23,7 +30,14 @@ def get_wishlist():
     for item in wishlist_items:
         book = Book.query.get(item.book_id)
         if book:
-            books_in_wishlist.append({'id': book.id, 'title': book.title, 'author': book.author})
+            books_in_wishlist.append({
+                'id': book.id,
+                'title': book.title,
+                'author': book.author,
+                'status': item.status,
+                'date_added': item.date_added.strftime('%Y-%m-%d'),  # Format date to exclude time
+                'availability': item.availability
+            })
     return jsonify(books_in_wishlist)
 
 # Route to add a book to the wishlist
@@ -78,24 +92,73 @@ def delete_book_from_wishlist(book_id):
 @wishlist_api.route('/<int:item_id>', methods=['PUT'])
 def update_wishlist_item_route(item_id):
     """Update a wishlist item."""
+    logger.info(f"Received request to update wishlist item with ID: {item_id}")
     if request.is_json:
         data = request.get_json()
-        new_book_id = data.get('book_id')
+        new_status = data.get('status')
 
-        # Validate that new_book_id is provided
-        if not new_book_id:
-            return jsonify({"error": "Missing book_id"}), 400
+        # Validate the new status
+        if new_status not in ["for later", "in progress", "finished"]:
+            return jsonify({"error": "Invalid status"}), 400
 
-        # Check if the new book exists in the books database
-        book = Book.query.get(new_book_id)
-        if not book:
-            return jsonify({"error": "Book not found"}), 404
+        # Check if the item exists in the database
+        item = Wishlist.query.get(item_id)
+        if not item:
+            logger.warning(f"Wishlist item with ID {item_id} not found.")
+            return jsonify({"error": f"Wishlist item with id {item_id} not found."}), 404
 
         # Update the wishlist item
-        result = update_wishlist_item(item_id, new_book_id)
+        result = update_wishlist_item(item_id, new_status)
         if "updated" in result:
+            logger.info(f"Wishlist item with ID {item_id} updated successfully.")
             return jsonify({"message": result}), 200
         else:
-            return jsonify({"error": result}), 404
+            logger.warning(f"Failed to update wishlist item with ID {item_id}.")
+            return jsonify({"error": result}), 500
+
+    logger.error("Request must be JSON.")
+    return jsonify({"error": "Request must be JSON"}), 415
+
+# Route to get availability of a book in the wishlist
+@wishlist_api.route('/availability/<int:book_id>', methods=['GET'])
+def get_book_availability(book_id):
+    """Get the availability of a book in the wishlist."""
+    wishlist_item = Wishlist.query.filter_by(book_id=book_id).first()
+    if wishlist_item:
+        return jsonify({"availability": wishlist_item.availability}), 200
+    else:
+        return jsonify({"error": "Book not found in wishlist"}), 404
+
+# Route to update availability of a book in the wishlist (admin only)
+@wishlist_api.route('/availability/<int:item_id>', methods=['PUT'])
+@token_required()
+def update_book_availability(item_id):
+    """Update the availability of a book in the wishlist (admin only)."""
+    current_user = g.current_user
+
+    if current_user.role != 'Admin':
+        return {'message': 'Unauthorized.'}, 401
+
+    if request.is_json:
+        data = request.get_json()
+        new_availability = data.get('availability')
+
+        # Validate the new availability
+        if new_availability not in ["available", "out of stock"]:
+            return jsonify({"error": "Invalid availability"}), 400
+
+        # Update the availability
+        with app.app_context():
+            try:
+                item = Wishlist.query.get(item_id)
+                if item:
+                    item.availability = new_availability
+                    db.session.commit()
+                    return jsonify({"message": f"Wishlist item with id {item_id} updated to {new_availability}."}), 200
+                else:
+                    return jsonify({"error": "Wishlist item not found"}), 404
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
     return jsonify({"error": "Request must be JSON"}), 415
