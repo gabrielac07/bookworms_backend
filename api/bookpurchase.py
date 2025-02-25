@@ -11,6 +11,7 @@ api = Api(bookpurchase_api)
 
 # 1. Get all items in the cart (R)
 @bookpurchase_api.route('/cart', methods=['GET'])
+@token_required()
 def get_cart():
     """Fetch all items in the cart along with total price and quantity."""
     items = CartItem.query.all()
@@ -18,7 +19,7 @@ def get_cart():
     total_price = sum(item.price * item.quantity for item in items)
 
     return jsonify({
-        "items": [item.read() for item in items],  # Use `read` method from CartItem
+        "items": [item.read() for item in items],  # Use read method from CartItem
         "total_items": total_items,
         "total_price": round(total_price, 2)
     })
@@ -58,6 +59,7 @@ def add_to_cart():
 
 # 3. Update an item's quantity in the cart (U)
 @bookpurchase_api.route('/cart/<int:item_id>', methods=['PUT'])
+@token_required()
 def update_cart_item(item_id):
     """Update the quantity of a specific item in the cart."""
     data = request.get_json()
@@ -83,6 +85,7 @@ def update_cart_item(item_id):
 
 # 4. Remove an item from the cart (D)
 @bookpurchase_api.route('/cart/<int:item_id>', methods=['DELETE'])
+@token_required()
 def delete_cart_item(item_id):
     """Remove a specific item from the cart."""
     # Fetch the item by ID
@@ -98,10 +101,10 @@ def delete_cart_item(item_id):
 
 # 5. Clear the entire cart
 @bookpurchase_api.route('/cart', methods=['DELETE'])
+@token_required()
 def clear_cart():
     """Clear all items from the cart."""
     # Delete all rows in the CartItem table
     CartItem.query.delete()
     db.session.commit()
     return jsonify({"message": "Cart cleared successfully."})
-
