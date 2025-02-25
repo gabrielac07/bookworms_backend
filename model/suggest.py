@@ -161,6 +161,7 @@ def initSuggest():
         SuggestedBook(title="The Cruel Prince", author="Holly Black", genre="Fantasy", description="Jude was seven years old when her parents were murdered and she and her two sisters were stolen away to live in the treacherous High Court of Faerie. Ten years later, Jude wants nothing more than to belong there, despite her mortality. But many of the fey despise humans.", cover_url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFRlLnHzV7FMzb6ouRYUgQmKd34ss7NZTbcw&s"),    
         SuggestedBook(title="The Very Hungry Caterpillar", author="Eric Carle", genre="Classics", description="The plot follows a very hungry caterpillar that consumes a variety of foods before pupating and becoming a butterfly", cover_url="https://upload.wikimedia.org/wikipedia/en/b/b5/HungryCaterpillar.JPG"),    
     ]
+    
 
     for suggestion in suggest_data:
             try:
