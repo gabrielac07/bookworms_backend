@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g
 from __init__ import app, db  # Import db object from your Flask app's __init__.py
 from model.librarydb import Book
 from model.wishlist import Wishlist, update_wishlist_item, get_wishlist, add_to_wishlist, delete_from_wishlist  # Import the functions
@@ -7,6 +8,10 @@ from model.user import User
 
 # Create a Blueprint for the wishlist functionality
 wishlist_api = Blueprint('wishlist_api', __name__, url_prefix='/api/wishlist')
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Route to get a dropdown list of books
 @wishlist_api.route('/books', methods=['GET'])
@@ -99,6 +104,7 @@ def update_wishlist_item_route(id):
     if request.is_json:
         data = request.get_json()
         new_status = data.get('status')
+        new_status = data.get('status')
 
         # Validate the new status
         if new_status not in ["for later", "in progress", "finished"]:
@@ -107,6 +113,7 @@ def update_wishlist_item_route(id):
         # Update the wishlist item
         result = update_wishlist_item(id, new_status)
         if "updated" in result:
+            logger.info(f"Wishlist item with ID {item_id} updated successfully.")
             return jsonify({"message": result}), 200
         else:
             return jsonify({"error": result}), 400

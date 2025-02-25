@@ -3,6 +3,7 @@ from sqlalchemy import Text, JSON
 from __init__ import app, db
 from sqlalchemy import Column, Integer, String, Text
 from sqlite3 import IntegrityError
+import random
 
 class Book(db.Model):
     __tablename__ = 'books'
@@ -12,6 +13,9 @@ class Book(db.Model):
     genre = db.Column(String)
     description = db.Column(Text)
     cover_url = db.Column(String)
+
+    def __repr__(self):
+        return f"<Book(id={self.id}, title={self.title}, author={self.author})>"
 
     # CRUD methods for Book class
     def create(self):

@@ -9,6 +9,13 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+from datetime import datetime, date
+import random
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Define the Wishlist model
 class Wishlist(db.Model):
@@ -17,6 +24,9 @@ class Wishlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_uid = db.Column(db.String, db.ForeignKey('users._uid'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('books.id'), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default="for later")
+    date_added = db.Column(db.Date, default=lambda: datetime.utcnow().date())
+    availability = db.Column(db.String(20), nullable=False, default=lambda: random.choice(["available", "out of stock"]))
     status = db.Column(db.String(20), nullable=False, default="for later")
     date_added = db.Column(db.Date, default=lambda: datetime.utcnow().date())
     availability = db.Column(db.String(20), nullable=False, default=lambda: random.choice(["available", "out of stock"]))
@@ -33,6 +43,9 @@ class Wishlist(db.Model):
             "id": self.id,
             "user_uid": self.user_uid,
             "book_id": self.book_id,
+            "status": self.status,
+            "date_added": self.date_added.strftime('%Y-%m-%d'),  # Format date to exclude time
+            "availability": self.availability,
             "status": self.status,
             "date_added": self.date_added.strftime('%Y-%m-%d'),  # Format date to exclude time
             "availability": self.availability,
@@ -57,9 +70,14 @@ class Wishlist(db.Model):
                     if 'date_added' in record and isinstance(record['date_added'], str):
                         record['date_added'] = datetime.strptime(record['date_added'], '%Y-%m-%d').date()
                     
+                    # Convert date_added from string to date object
+                    if 'date_added' in record and isinstance(record['date_added'], str):
+                        record['date_added'] = datetime.strptime(record['date_added'], '%Y-%m-%d').date()
+                    
                     # Exclude 'id' to let the database auto-generate it
                     if 'id' in record:
                         del record['id']
+                    
                     
                     wishlist_item = cls(**record)  # Unpack dictionary into model fields
                     db.session.add(wishlist_item)
@@ -162,6 +180,7 @@ def add_to_wishlist(user_uid, book_id):
 # Function to update a wishlist item
 def update_wishlist_item(id, new_status):
     """
+    Update a wishlist item's status by its ID.
     Update a wishlist item's status by its ID.
 
     Args:
