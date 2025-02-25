@@ -3,6 +3,7 @@ from flask_restful import Api
 from model.librarydb import Book  # Import your Book model
 from __init__ import app, db  # Import Flask app and database instance
 from model.bookpurchasedb import CartItem  # Import your CartItem model
+from api.jwt_authorize import token_required, g
 
 # Blueprint setup for the book purchase API
 bookpurchase_api = Blueprint('bookpurchase_api', __name__, url_prefix='/api')
@@ -25,6 +26,7 @@ def get_cart():
 
 # 2. Add an item to the cart (C)
 @bookpurchase_api.route('/cart', methods=['POST'])
+@token_required()
 def add_to_cart():
     """Add a new item to the cart or update the quantity if it already exists."""
     data = request.get_json()
