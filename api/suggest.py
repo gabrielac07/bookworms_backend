@@ -145,6 +145,7 @@ def delete_book():
     except Exception as e:
         return jsonify({'error': 'Failed to delete book', 'message': str(e)}), 500
 
+
 @suggest_api.route('/accept', methods=['POST'])
 @token_required()
 def accept_suggestion():
