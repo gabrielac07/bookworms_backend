@@ -1,5 +1,7 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from flask_restful import Api
+from flask_login import current_user, login_required
+from api.jwt_authorize import token_required
 from model.librarydb import Book
 from model.suggest import SuggestedBook
 from __init__ import db
@@ -142,3 +144,56 @@ def delete_book():
         return jsonify({'message': 'Book deleted successfully'}), 200
     except Exception as e:
         return jsonify({'error': 'Failed to delete book', 'message': str(e)}), 500
+
+
+@suggest_api.route('/accept', methods=['POST'])
+@token_required()
+def accept_suggestion():
+    data = request.json
+
+    title = data.get('title')
+    author = data.get('author')
+    genre = data.get('genre')
+    description = data.get('description')
+    cover_url = data.get('cover_url')
+    
+    if g.current_user.role != 'Admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    if not request.json or 'title' not in request.json:
+        return jsonify({'error': 'Title is required to add the book'}), 400
+
+    try:
+        # Create and add the suggested book
+        accepted_book = Book(title=title, author=author, genre=genre, description=description, cover_url=cover_url)
+        accepted_book.create()
+        return jsonify({'message': 'Book added successfully'}), 201
+    except Exception as e:
+        return jsonify({'error': 'Failed to add book', 'message': str(e)}), 500
+    
+# unused reject code (appends REJECTED: to the title)
+@suggest_api.route('/reject', methods=['POST'])
+@token_required()
+def reject_suggestion():
+    data = request.json
+    title = data.get('title')
+
+    if g.current_user.role != 'Admin':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    if not title:
+        return jsonify({'error': 'Title is required to reject the book'}), 400
+
+    try:
+        book = SuggestedBook.query.filter_by(title=title).first()
+        if not book:
+            return jsonify({'error': 'Book not found'}), 404
+
+        # Prepend "Rejected: " only if it's not already there
+        if not book.title.startswith("REJECTED: "):
+            book.title = f"REJECTED: {book.title}"
+            book.update()
+
+        return jsonify({'message': 'Book rejected successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to reject book', 'message': str(e)}), 500
