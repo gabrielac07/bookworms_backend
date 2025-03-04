@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify, current_app, Response, g, Flask 
 from flask_restful import Api, Resource  # used for REST API building
 from __init__ import app, db
+from model.librarydb import Book
 from model.emotion import Emotion
 
 emotion_api = Blueprint('emotion_api', __name__, url_prefix='/api/emotion')
 api = Api(emotion_api)
-
 
 # Create - Endpoint to add a reaction to a message
 @emotion_api.route('', methods=['POST']) #{"user_id": 2, "title_id": "It", "author_id" : "Stephen King", "reaction_type": "🎉"}
@@ -24,28 +24,15 @@ def add_emotion():
         return jsonify({'message': 'Emotion added successfully to post'}), 201
     except Exception as e:
         return jsonify({'error': 'Failed to add emotion', 'message': str(e)}), 500
-    
-'''
-# Create - Endpoint to add a custom emoji
-@emotion_api.route('/add_emoji', methods=['POST']) #{"emoji": "🔥"}
-def add_emoji():
-    data = request.json
-    new_emoji = data.get("emoji")
 
-    if not new_emoji:
-        return jsonify({"error": "Emoji is required"}), 400
 
-    if new_emoji in emojis:
-        return jsonify({"error": "Emoji already exists"}), 400
+@emotion_api.route('/books', methods=['GET'])
+def get_books():
+    """Retrieve all books from the database to display in a dropdown menu."""
+    books = Book.query.all()  # SQLAlchemy query to get all books from the books table
+    books_list = [{'id': book.id, 'title': book.title, 'author': book.author} for book in books]
+    return jsonify(books_list)
 
-    emojis.append(new_emoji)
-    return jsonify({"message": "Emoji added successfully", "emojis": emojis}), 200
-
-#Read - Get all available emojis
-@emotion_api.route('/get_emojis', methods=['GET'])
-def get_emojis():
-    return jsonify({"emojis": emojis}), 200
-'''
 
 # Read - Get all reactions for a specific book
 @emotion_api.route('/<title_id>', methods=['GET'])   #/It
@@ -59,7 +46,7 @@ def get_emotion(title_id):
             {
                 'user_id': emo.user_id,
                 'reaction_type': emo.reaction_type,
-#                'author_id': emo.author_id
+                'author_id': emo.author_id
             }
             for emo in emotions
         ]
@@ -69,7 +56,7 @@ def get_emotion(title_id):
         }), 200
     except Exception as e:
         return jsonify({'error': 'Failed to get reactions', 'message': str(e)}), 500
-    
+
 # Read - Get all reactions for a specific user
 @emotion_api.route('/user/<user_id>', methods=['GET'])   #/1
 def get_user_emotion(user_id):
@@ -94,21 +81,21 @@ def get_user_emotion(user_id):
         return jsonify({'error': 'Failed to get reactions', 'message': str(e)}), 500
 
 # Update - Update a user's reaction on a post
-@emotion_api.route('/update', methods=['PUT']) #{"user_id": 2, "title_id": "It", "reaction_type": "👍", "author_id": "Stephen King"}
+@emotion_api.route('/update', methods=['PUT']) #{"user_id": 2, "title_id": "It", "reaction_type": "👍"}
 def update_emotion():
     data = request.json
+    print("Update Request Data:", data)  # Debugging
     user_id = data.get("user_id")
     title_id = data.get("title_id")
     new_reaction_type = data.get("reaction_type")
-    author_id = data.get("author_id")
 
     # validate input
-    if not user_id or not title_id or not new_reaction_type or not author_id:
-        return jsonify({"error": "All fields (user_id, title_id, reaction_type, author_id) are required"}), 400
+    if not user_id or not title_id or not new_reaction_type:
+        return jsonify({"error": "All fields (user_id, title_id, reaction_type) are required"}), 400
 
     try:
         # Fetch the reaction from the database
-        emotion = Emotion.query.filter_by(user_id=user_id, title_id=title_id, author_id=author_id).first()
+        emotion = Emotion.query.filter_by(user_id=user_id, title_id=title_id).first()
 
         # If the reaction does not exist, return an error
         if not emotion:
@@ -130,24 +117,26 @@ def update_emotion():
         }), 200 
     except Exception as e:
         return jsonify({'error': 'Failed to update reaction', 'message': str(e)}), 500
-  
+
 # Delete - Remove a specific reaction
 @emotion_api.route('/delete', methods=['DELETE']) #{"user_id": 2, "title_id": "It", "reaction_type": "👍", "author_id": "Stephen King"}
 def delete_emotion():
     data = request.json
+    print("Delete Request Data:", data)  # Debugging
     user_id = data.get("user_id")
     title_id = data.get("title_id")
+    author_id = data.get("author_id")
 
-    if not user_id or not title_id:
-        return jsonify({"error": "Both user_id and post_id are required"}), 400
+    if not user_id or not title_id or not author_id:
+        return jsonify({"error": "All fields (user_id, title_id, author_id) are required"}), 400
 
-    # Query the Reaction model to find the reaction by user_id and post_id
-    emotion = Emotion.query.filter_by(user_id=user_id, title_id=title_id).first()
+    # Query the Reaction model to find the reaction by user_id, title_id, and author_id
+    emotion = Emotion.query.filter_by(user_id=user_id, title_id=title_id, author_id=author_id).first()
 
     if not emotion:
         return jsonify({"error": "Reaction not found"}), 404
     
-    # Delete the reaction from te database
+    # Delete the reaction from the database
     db.session.delete(emotion)
     db.session.commit()
 

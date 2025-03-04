@@ -2,16 +2,17 @@ from flask_restful import Api, Resource
 from sqlalchemy import Text, JSON
 from __init__ import app, db
 from sqlalchemy import Column, Integer, String, Text
+from model.librarydb import Book
 from sqlite3 import IntegrityError
 
 # Reaction model definition
 class Emotion(db.Model):
     __tablename__ = 'emotion'
-    id = db.Column(Integer, primary_key=True)
-    user_id = db.Column(String, db.ForeignKey('users.id'), nullable=False) #person
-    title_id = db.Column(String, nullable=False) #book title/series
-    author_id = db.Column(String, nullable=False) #author
-    reaction_type = db.Column(String, nullable=False) #reaction
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String, db.ForeignKey('users.id'), nullable=False) #person
+    title_id = db.Column(db.String, db.ForeignKey('books.title'), nullable=False) #book title/series
+    author_id = db.Column(db.String, db.ForeignKey('books.author'), nullable=False) #author
+    reaction_type = db.Column(db.String, nullable=False) #reaction
 
 
 
@@ -92,24 +93,32 @@ class Emotion(db.Model):
             # Remove 'id' from the data if it exists (because id will be auto-generated)
             _ = reaction_data.pop('id', None)
 
-            # Check if the book already exists based on title
-            existing_user_id = Emotion.query.filter_by(title=reaction_data.get("title")).first()
-            if existing_user_id:
-                # Update the existing book with new data
-                existing_user_id.reaction_type = existing_user_id.get('reaction_type', existing_user_id.reaction_type)
-                existing_user_id.user_id = existing_user_id.get('user_id', existing_user_id.user_id)
-                existing_user_id.title_id = existing_user_id.get('title_id', existing_user_id.title_id)
-                existing_user_id.author_id = existing_user_id.get('author_id', existing_user_id.author_id)
-        
+            # Check if the reaction already exists for the same user and book
+            existing_reaction = Emotion.query.filter_by(
+                user_id=reaction_data.get("user_id"),
+                title_id=reaction_data.get("title_id")
+            ).first()
+
+            if existing_reaction:
+                # Update the existing reaction with new data
+                existing_reaction.reaction_type = reaction_data.get('reaction_type', existing_reaction.reaction_type)
+                existing_reaction.author_id = reaction_data.get('author_id', existing_reaction.author_id)
+
                 db.session.commit()
-                restored_reactions[existing_user_id.id] = existing_user_id
+                restored_reactions[existing_reaction.id] = existing_reaction
             else:
-                # Create a new suggested book
-                new_book = Emotion(**existing_user_id)
-                new_book.create()
-                restored_reactions[new_book.id] = new_book
+                # Create a new reaction
+                new_reaction = Emotion(
+                    reaction_type=reaction_data["reaction_type"],
+                    user_id=reaction_data["user_id"],
+                    title_id=reaction_data["title_id"],
+                    author_id=reaction_data["author_id"]
+                )
+                new_reaction.create()
+                restored_reactions[new_reaction.id] = new_reaction
 
         return restored_reactions
+
 
 # reaction data to insert
 def initEmotion(): 
