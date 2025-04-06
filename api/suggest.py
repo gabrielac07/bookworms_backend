@@ -144,7 +144,7 @@ def delete_book():
 
 
 @suggest_api.route('/accept', methods=['POST'])
-@token_required()
+@token_required(roles=['Admin'])
 def accept_suggestion():
     data = request.json
 
@@ -168,8 +168,30 @@ def accept_suggestion():
     except Exception as e:
         return jsonify({'error': 'Failed to add book', 'message': str(e)}), 500
     
+@suggest_api.route('/reject', methods=['DELETE'])
+@token_required(roles=['Admin'])
+def reject_book():
+    data = request.json
+    
+    title = data.get('title')
+    if not title:
+        return jsonify({'error': 'Title is required to reject the book'}), 400
+
+    try:
+        suggested_book = SuggestedBook.query.filter_by(title=title).first()
+        
+        if not suggested_book:
+            return jsonify({'error': 'Book not found'}), 404
+        
+        db.session.delete(suggested_book)
+        db.session.commit()
+        
+        return jsonify({'message': 'Book rejected successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to reject book', 'message': str(e)}), 500
+    
 # unused reject code (appends REJECTED: to the title)
-@suggest_api.route('/reject', methods=['POST'])
+@suggest_api.route('/reject1', methods=['POST'])
 @token_required()
 def reject_suggestion():
     data = request.json
