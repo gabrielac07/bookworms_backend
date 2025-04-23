@@ -68,6 +68,7 @@ def get_suggestion():
         # Convert the list of book objects to a list of dictionaries
         books_data = [
             {
+                'id': book.id,
                 'title': book.title,
                 'author': book.author,
                 'genre': book.genre,
@@ -97,17 +98,13 @@ def random_book():
         return jsonify({'error': 'No books found'}), 404
     
 # Endpoint to update existing suggested book (Update)
-@suggest_api.route('', methods=['PUT'])
-def update_book():
+@suggest_api.route('/<int:book_id>', methods=['PUT'])
+def update_book(book_id):
     data = request.json
 
-    title = data.get('title')
-    if not title:
-        return jsonify({'error': 'Title is required to update the book'}), 400
-
     try:
-        # Fetch the existing book by title
-        suggested_book = SuggestedBook.query.filter_by(title=title).first()
+        # Fetch the existing book by ID
+        suggested_book = SuggestedBook.query.get(book_id)
         if not suggested_book:
             return jsonify({'error': 'Book not found'}), 404
 
@@ -147,7 +144,7 @@ def delete_book():
 
 
 @suggest_api.route('/accept', methods=['POST'])
-@token_required()
+@token_required(roles=['Admin'])
 def accept_suggestion():
     data = request.json
 
@@ -171,8 +168,30 @@ def accept_suggestion():
     except Exception as e:
         return jsonify({'error': 'Failed to add book', 'message': str(e)}), 500
     
+@suggest_api.route('/reject', methods=['DELETE'])
+@token_required(roles=['Admin'])
+def reject_book():
+    data = request.json
+    
+    title = data.get('title')
+    if not title:
+        return jsonify({'error': 'Title is required to reject the book'}), 400
+
+    try:
+        suggested_book = SuggestedBook.query.filter_by(title=title).first()
+        
+        if not suggested_book:
+            return jsonify({'error': 'Book not found'}), 404
+        
+        db.session.delete(suggested_book)
+        db.session.commit()
+        
+        return jsonify({'message': 'Book rejected successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to reject book', 'message': str(e)}), 500
+    
 # unused reject code (appends REJECTED: to the title)
-@suggest_api.route('/reject', methods=['POST'])
+@suggest_api.route('/reject1', methods=['POST'])
 @token_required()
 def reject_suggestion():
     data = request.json

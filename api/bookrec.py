@@ -42,7 +42,7 @@ def random_bookrec():
             #print("No books found, retrying in 5 seconds...")
 
 # Endpoint to save a book recommendation (This is what I'm using for the table checkpoint on Thurs/Fri)
-@bookrec_api.route("/add_bookrec", methods=['POST']) # This is the endpoint to add a book to the savebookrec table
+@bookrec_api.route("/bookrec", methods=['POST']) # This is the endpoint to add a book to the savebookrec table
 def add_book():
     data = request.get_json() # Get the data from the request
     title = data.get('title') 
@@ -66,51 +66,74 @@ def add_book():
     db.session.commit() # Commit the changes to the database
     
     return jsonify({"message": "Book added successfully", 'success': True, 'id': new_book.id}), 201
-
-# Read a single book recommendation by ID
-@bookrec_api.route("/get_bookrec/<int:id>", methods=['GET']) # after the get_bookrec/ enter the id number (USE 1 or 2) of the book you want to get
-def get_book(id):
-    book = SaveBookRec.query.get(id)
-
-    if not book:
-        return jsonify({"error": "Book not found"}), 404
-
-    return jsonify(book.read()), 200 
-
-# Read all book recommendations
-@bookrec_api.route("/get_bookrecs", methods=['GET'])
+ 
+# Read and display all book recommendations
+@bookrec_api.route("/bookrec/book", methods=['GET'])
 def get_books():
-    books = SaveBookRec.query.all()
-    return jsonify([book.read() for book in books]), 200
+    try:
+        # Query all add books recs
+        books = SaveBookRec.query.all()
 
-# Update an existing book recommendation by id number assigned to it on the table
-@bookrec_api.route("/update_bookrec/<int:id>", methods=['PUT']) # after the update_bookrec/ enter the id number (USE 3 and change the genre to Fantasy) of the book you want to update
-def update_book(id):
-    data = request.get_json()
-    book = SaveBookRec.query.get(id) # Get the book by ID from the savebookrec table
+        # Convert the list of book objects to a list of dictionaries
+        books_data = [
+            {
+                'id': book.id,
+                'title': book.title,
+                'author': book.author,
+                'genre': book.genre,
+                'description': book.description,
+                'cover_url': book.cover_url
+            }
+            for book in books
+        ]
 
+        return jsonify(books_data), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch books', 'message': str(e)}), 500
+
+# Endpoint to update a book recommendation
+@bookrec_api.route('/bookrec', methods=['PUT']) 
+def update_book():
+    data = request.json # Get the data from the request
+    title = data.get('title')
+
+    if not title:
+        return jsonify({'error': 'Title is required to update the book'}), 400
+
+    book = SaveBookRec.query.filter_by(title=title).first()
     if not book:
-        return jsonify({"error": "Book not found"}), 404
+        return jsonify({'error': 'Book not found'}), 404
 
-    book.title = data.get('title', book.title)
-    book.author = data.get('author', book.author)
-    book.genre = data.get('genre', book.genre)
-    book.description = data.get('description', book.description)
-    book.cover_url = data.get('cover_url', book.cover_url)
+    try:
+        book.author = data.get('author', book.author)
+        book.genre = data.get('genre', book.genre)
+        book.description = data.get('description', book.description)
+        book.cover_url = data.get('cover_url', book.cover_url)
+        db.session.commit()
+        return jsonify({'message': 'Book updated successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to update book', 'message': str(e)}), 500
 
-    db.session.commit() # Commit the changes to the database
+# Endpoint to delete a book recommendation
+@bookrec_api.route('/bookrec', methods=['DELETE'])
+def delete_book():
+    data = request.json
     
-    return jsonify({"message": "Book updated successfully"}), 200
+    title = data.get('title')
+    if not title:
+        return jsonify({'error': 'Title is required to delete the book'}), 400
 
-# Delete an existing book recommendation by id number assigned to it on the table
-@bookrec_api.route("/delete_bookrec/<int:id>", methods=['DELETE']) # after the delete_bookrec/ enter the id number (USE 3) to deleted the added book (A Feast for Crows)
-def delete_book(id):
-    book = SaveBookRec.query.get(id) # Get the book by ID from the savebookrec table
+    try:
+        bookrec = SaveBookRec.query.filter_by(title=title).first()
+        
+        if not bookrec:
+            return jsonify({'error': 'Book not found'}), 404
+        
+        db.session.delete(bookrec)
+        db.session.commit()
+        
+        return jsonify({'message': 'Book deleted successfully'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to delete book', 'message': str(e)}), 500
 
-    if not book:
-        return jsonify({"error": "Book not found"}), 404
-
-    db.session.delete(book) # Delete the book from the savebookrec table
-    db.session.commit() # Commit the changes to the database
-    
-    return jsonify({"message": "Book deleted successfully"}), 200
