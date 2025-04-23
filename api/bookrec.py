@@ -69,7 +69,7 @@ def add_book():
 
 # Read a single book recommendation by ID
 @bookrec_api.route("/get_bookrec/<int:id>", methods=['GET']) # after the get_bookrec/ enter the id number (USE 1 or 2) of the book you want to get
-def get_book(id):
+def get_single_book(id):
     book = SaveBookRec.query.get(id)
 
     if not book:
@@ -77,30 +77,52 @@ def get_book(id):
 
     return jsonify(book.read()), 200 
 
-# Read all book recommendations
+# Read and display all book recommendations
 @bookrec_api.route("/get_bookrecs", methods=['GET'])
-def get_books():
-    books = SaveBookRec.query.all()
-    return jsonify([book.read() for book in books]), 200
+def get_book():
+    try:
+        # Query all suggested books
+        books = SaveBookRec.query.all()
+
+        # Convert the list of book objects to a list of dictionaries
+        books_data = [
+            {
+                'id': book.id,
+                'title': book.title,
+                'author': book.author,
+                'genre': book.genre,
+                'description': book.description,
+                'cover_url': book.cover_url
+            }
+            for book in books
+        ]
+
+        return jsonify(books_data), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch books', 'message': str(e)}), 500
 
 # Update an existing book recommendation by id number assigned to it on the table
 @bookrec_api.route("/update_bookrec/<int:id>", methods=['PUT']) # after the update_bookrec/ enter the id number (USE 3 and change the genre to Fantasy) of the book you want to update
 def update_book(id):
-    data = request.get_json()
-    book = SaveBookRec.query.get(id) # Get the book by ID from the savebookrec table
+    data = request.json # Get the data from the request
 
-    if not book:
-        return jsonify({"error": "Book not found"}), 404
+    try:
+        book = SaveBookRec.query.get(id) # Get the book by ID from the savebookrec table
 
-    book.title = data.get('title', book.title)
-    book.author = data.get('author', book.author)
-    book.genre = data.get('genre', book.genre)
-    book.description = data.get('description', book.description)
-    book.cover_url = data.get('cover_url', book.cover_url)
-
-    db.session.commit() # Commit the changes to the database
+        if not book:
+            return jsonify({"error": "Book not found"}), 404
+    #update book titles
+        book.title = data.get('title', book.title)
+        book.author = data.get('author', book.author)
+        book.genre = data.get('genre', book.genre)
+        book.description = data.get('description', book.description)
+        book.cover_url = data.get('cover_url', book.cover_url)
     
-    return jsonify({"message": "Book updated successfully"}), 200
+        db.session.commit() # Commit the changes to the database
+    
+        return jsonify({"message": "Book updated successfully"}), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to update book', 'message': str(e)}), 500
 
 # Delete an existing book recommendation by id number assigned to it on the table
 @bookrec_api.route("/delete_bookrec/<int:id>", methods=['DELETE']) # after the delete_bookrec/ enter the id number (USE 3) to deleted the added book (A Feast for Crows)

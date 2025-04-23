@@ -6,12 +6,12 @@ from model.librarydb import Book
 
 class SaveBookRec(db.Model): # Class to save a book recommendation
     __tablename__ = 'savedbookrecs' # name of the table
-    id = db.Column(Integer, primary_key=True)
-    title = db.Column(String, nullable=False)
-    author = db.Column(String, nullable=False)
-    genre = db.Column(String)
-    description = db.Column(Text)
-    cover_url = db.Column(String)
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String, nullable=False)
+    author = db.Column(db.String, nullable=False)
+    genre = db.Column(db.String, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    cover_url = db.Column(db.String, nullable=True)
 
     def __init__(self, title, author, genre, description, cover_url): # Constructor to initialize the book recommendation
         self.title = title
@@ -19,6 +19,34 @@ class SaveBookRec(db.Model): # Class to save a book recommendation
         self.genre = genre
         self.description = description
         self.cover_url = cover_url
+
+    def add_bookrec(title, author, genre, description, cover_url):
+        new_bookrec = SaveBookRec( # Create a new book recommendation object
+            title=title,
+            author=author,
+            genre=genre,
+            description=description,
+            cover_url=cover_url
+        )
+
+        new_book = Book( # Create a new book object
+            title=title,
+            author=author,
+            genre=genre,
+            description=description,
+            cover_url=cover_url
+        )
+
+        try:
+            db.session.add(new_bookrec)
+            db.session.add(new_book)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+
+    def __repr__(self):
+        return f"<SaveBookRec {self.title}>"
 
     def read(self): # Function to read the book recommendation
         return {
@@ -30,6 +58,32 @@ class SaveBookRec(db.Model): # Class to save a book recommendation
             'cover_url': self.cover_url
         }
     
+    def update(self): # Function to update the book recommendation
+        """
+        The update method commits the transaction to the database.
+        
+        Uses: The db ORM method to commit the transaction.
+        """
+        try: # Try to update the book recommendation
+            db.session.add(self) # Add the book recommendation to the session
+            db.session.commit() 
+        except Exception as e:  # If an error occurs, rollback the changes
+            db.session.rollback()
+            raise e
+    
+    def delete(self): # Function to delete the book recommendation
+        """
+        The delete method removes the object from the database and commits the transaction.
+        
+        Uses: The db ORM methods to delete and commit the transaction.
+        """    
+        try: # Try to delete the book recommendation
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e: # If an error occurs, rollback the changes
+            db.session.rollback()
+        raise Exception(f"An error occurred while deleting the object: {str(e)}") from e
+
     @classmethod # Class method to restore the book recommendation
     def restore(cls, data):
         for item in data:
@@ -48,6 +102,7 @@ class SaveBookRec(db.Model): # Class to save a book recommendation
                 )
                 db.session.add(new_record)
         db.session.commit()
+        return cls.query.all() # Return all book recommendations
 
 # Static data
 def initSavedBookRecs(): # Function to initialize the saved book recommendations
@@ -71,18 +126,14 @@ def initSavedBookRecs(): # Function to initialize the saved book recommendations
             db.session.add(save_newbookrec)  # Add the book to session
     '''
     for title, author, genre, description, cover_url in saved_bookrecs_data: # Iterate through the saved book recommendations
-        # Check if the book already exists in the database
-        if not SaveBookRec.query.filter_by(title=title, author=author).first():
-            new_book = SaveBookRec(title=title, author=author, genre=genre, description=description, cover_url=cover_url)
-            db.session.add(new_book)
-
-    try: # Try to add the new book to the database
-        #db.session.add(save_newbookrec)
-        #db.session.add(new_book)
-        db.session.commit() # Commit the changes to the database
-    except Exception as e: # If an error occurs, rollback the changes and raise the error
-        db.session.rollback() # Rollback the changes
-        raise e # Raise the error
+        try: # Check if the book already exists in the database
+            if not SaveBookRec.query.filter_by(title=title, author=author).first():
+                new_book = SaveBookRec(title=title, author=author, genre=genre, description=description, cover_url=cover_url)
+                db.session.add(new_book)
+                db.session.commit() # Commit the changes to the database
+        except Exception as e: # If an error occurs, rollback the changes and raise the error
+            db.session.rollback() # Rollback the changes
+            raise e # Raise the error
 
 # Create the table before inserting data
 with app.app_context():
