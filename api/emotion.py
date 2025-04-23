@@ -1,3 +1,4 @@
+## api, backend
 from flask import Blueprint, request, jsonify, current_app, Response, g, Flask 
 from flask_restful import Api, Resource  # used for REST API building
 from __init__ import app, db

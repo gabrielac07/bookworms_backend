@@ -1,3 +1,4 @@
+## model, backend
 from flask_restful import Api, Resource
 from sqlalchemy import Text, JSON
 from __init__ import app, db
@@ -13,8 +14,6 @@ class Emotion(db.Model):
     title_id = db.Column(db.String, db.ForeignKey('books.title'), nullable=False) #book title/series
     author_id = db.Column(db.String, db.ForeignKey('books.author'), nullable=False) #author
     reaction_type = db.Column(db.String, nullable=False) #reaction
-
-
 
     def __init__(self, reaction_type, user_id, title_id, author_id):
         self.reaction_type = reaction_type
