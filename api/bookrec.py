@@ -42,44 +42,33 @@ def random_bookrec():
             #print("No books found, retrying in 5 seconds...")
 
 # Endpoint to save a book recommendation (This is what I'm using for the table checkpoint on Thurs/Fri)
-@bookrec_api.route('/api/bookrec', methods=['POST']) # This is the endpoint to add a book to the savebookrec table
-def add_bookrec():
-    data = request.json
-    title = data.get('title')
+@bookrec_api.route("/bookrec", methods=['POST']) # This is the endpoint to add a book to the savebookrec table
+def add_book():
+    data = request.get_json() # Get the data from the request
+    title = data.get('title') 
     author = data.get('author')
     genre = data.get('genre')
     description = data.get('description')
-    cover_url = data.get('cover_url')
+    cover_url = data.get('cover_url') 
 
     if not title or not author:
-        return jsonify({'error': 'Title and author are required'}), 400
+        return jsonify({"error": "Title and author are required"}), 400
 
-    try:
-        new_book = SaveBookRec(
-            title=title, 
-            author=author, 
-            genre=genre, 
-            description=description, 
-            cover_url=cover_url)
-        db.session.add(new_book)
-        db.session.commit()
-        return jsonify({'message': 'Book added successfully', 'id': new_book.id}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': 'Failed to add book', 'message': str(e)}), 500
+    new_book = SaveBookRec( # Create a new book object
+        title=title,
+        author=author,
+        genre=genre,
+        description=description,
+        cover_url=cover_url
+    )
+
+    db.session.add(new_book) # Add the new book to the savebookrec table
+    db.session.commit() # Commit the changes to the database
+    
+    return jsonify({"message": "Book added successfully", 'success': True, 'id': new_book.id}), 201
  
-# Read a single book recommendation by ID
-@bookrec_api.route("/get_bookrec/<int:id>", methods=['GET']) # after the get_bookrec/ enter the id number (USE 1 or 2) of the book you want to get
-def get_single_book(id):
-    book = SaveBookRec.query.get(id)
-
-    if not book:
-        return jsonify({"error": "Book not found"}), 404
-
-    return jsonify(book.read()), 200 
-
 # Read and display all book recommendations
-@bookrec_api.route("/api/bookrec/book", methods=['GET'])
+@bookrec_api.route("/bookrec/book", methods=['GET'])
 def get_books():
     try:
         # Query all add books recs
@@ -103,7 +92,7 @@ def get_books():
         return jsonify({'error': 'Failed to fetch books', 'message': str(e)}), 500
 
 # Endpoint to update a book recommendation
-@bookrec_api.route('/api/bookrec', methods=['PUT']) 
+@bookrec_api.route('/bookrec', methods=['PUT']) 
 def update_book():
     data = request.json # Get the data from the request
     title = data.get('title')
@@ -127,23 +116,24 @@ def update_book():
         return jsonify({'error': 'Failed to update book', 'message': str(e)}), 500
 
 # Endpoint to delete a book recommendation
-@bookrec_api.route('/api/bookrec', methods=['DELETE'])
-def delete_bookrec():
+@bookrec_api.route('/bookrec', methods=['DELETE'])
+def delete_book():
     data = request.json
+    
     title = data.get('title')
-
     if not title:
         return jsonify({'error': 'Title is required to delete the book'}), 400
 
-    book = SaveBookRec.query.filter_by(title=title).first()
-    if not book:
-        return jsonify({'error': 'Book not found'}), 404
-
     try:
-        db.session.delete(book)
+        bookrec = SaveBookRec.query.filter_by(title=title).first()
+        
+        if not bookrec:
+            return jsonify({'error': 'Book not found'}), 404
+        
+        db.session.delete(bookrec)
         db.session.commit()
+        
         return jsonify({'message': 'Book deleted successfully'}), 200
     except Exception as e:
-        db.session.rollback()
         return jsonify({'error': 'Failed to delete book', 'message': str(e)}), 500
 
