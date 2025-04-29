@@ -28,10 +28,14 @@ def get_cart():
 # 2. Add an item to the cart (C)
 @bookpurchase_api.route('/cart', methods=['POST'])
 @token_required()
-def add_to_cart():
-    """Add a new item to the cart or update the quantity if it already exists."""
+def add_to_cart_route():
+    """Route wrapper to parse JSON and pass it to the logic function."""
     data = request.get_json()
+    return add_to_cart(data)  # Now data is a physical parameter
 
+
+def add_to_cart(data):
+    """Add a new item to the cart or update the quantity if it already exists."""
     # Validate input data
     if not all(k in data for k in ('id', 'title', 'price', 'quantity', '_name')):
         return jsonify({"error": "All fields (id, title, price, quantity, _name) are required."}), 400
@@ -55,7 +59,6 @@ def add_to_cart():
     # Save changes to the database
     db.session.commit()
     return jsonify({"message": "Item added to cart successfully."}), 201
-
 
 # 3. Update an item's quantity in the cart (U)
 @bookpurchase_api.route('/cart/<int:item_id>', methods=['PUT'])
