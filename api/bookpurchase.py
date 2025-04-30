@@ -37,8 +37,10 @@ def add_to_cart_route():
 def add_to_cart(data):
     """Add a new item to the cart or update the quantity if it already exists."""
     # Validate input data
-    if not all(k in data for k in ('id', 'title', 'price', 'quantity', '_name')):
-        return jsonify({"error": "All fields (id, title, price, quantity, _name) are required."}), 400
+    required_keys = ('id', 'title', 'price', 'quantity', '_name')
+    for key in required_keys:
+        if key not in data:
+            return jsonify({"error": "All fields (id, title, price, quantity, _name) are required."}), 400
 
     # Check if item already exists in the cart
     item = CartItem.query.get(data['id'])
