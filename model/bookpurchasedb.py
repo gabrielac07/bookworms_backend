@@ -58,11 +58,11 @@ class CartItem(db.Model):
 # Initialize cart items
 def init_books_in_cart():
     books_in_cart = [
-        {"id": 1, "title": "1984", "price": 15.00, "quantity": 2, "username": "Avika"},
-        {"id": 2, "title": "The Hobbit", "price": 12.00, "quantity": 1, "username": "Soumini"},
-        {"id": 3, "title": "The Outsiders", "price": 10.00, "quantity": 4, "username": "Aarush"},
-        {"id": 4, "title": "A Game of Thrones", "price": 13.00, "quantity": 1, "username": "Aditi"},
-        {"id": 5, "title": "The Nightingale", "price": 16.00, "quantity": 2, "username": "Thomas Edison"}
+        {"id": 1, "title": "1984", "price": 15.00, "quantity": 2, "username": "user1"},
+        {"id": 2, "title": "The Hobbit", "price": 12.00, "quantity": 1, "username": "user2"},
+        {"id": 3, "title": "The Outsiders", "price": 10.00, "quantity": 4, "username": "user3"},
+        {"id": 4, "title": "A Game of Thrones", "price": 13.00, "quantity": 1, "username": "user4"},
+        {"id": 5, "title": "The Nightingale", "price": 16.00, "quantity": 2, "username": "user5"}
     ]
 
     CartItem.restore(books_in_cart)  # Use restore method to populate the database
